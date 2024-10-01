@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model SuperAdmin {
+  id       String  @id @default(uuid())
+  userName String  @unique
+  password String
+  role     String  @default("Super Admin")
+  admins   Admin[]
+
+  @@map("SuperAdmin")
+}
+
+model Admin {
+  id           String     @id @default(uuid())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  userName     String     @unique
+  password     String
+  role         String     @default("Admin")
+  superAdminId String
+  superAdmin   SuperAdmin @relation(fields: [superAdminId], references: [id])
+  users        User[]
+
+  @@map("Admin")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userName  String   @unique
+  password  String
+  role      String   @default("User")
+  adminId   String
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  batches   Batch[]
+
+  @@map("User")
+}
+
+model Batch {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  batchName String    @unique
+  inTime    String
+  outTime   String
+  state     Boolean   @default(true)
+  userId    String
+  user      User?     @relation(fields: [userId], references: [id])
+  students  Student[]
+
+  @@map("Batch")
+}
+
+model Student {
+  id            String        @id @default(uuid())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  studentName   String
+  aadhar_number Int           @unique
+  state         String
+  batchId       String
+  batch         Batch?        @relation(fields: [batchId], references: [id])
+  fingerprints  FingerPrint[]
+  details       Details? // Optional
+
+  @@map("Student")
+}
+
+model FingerPrint {
+  id        String  @id @default(uuid())
+  image     String
+  priority  Int
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id])
+
+  @@map("FingerPrint")
+}
+
+model Details {
+  id                String   @id @default(uuid())
+  aadhar_number     Int      @unique
+  mobile            Int
+  email             String
+  address           String
+  domicileState     String
+  domicileDistrict  String
+  idType            String
+  dob               DateTime
+  gender            String
+  maritalStatus     String
+  fatherGuardian    String
+  motherGuardian    String
+  religion          String
+  castCategory      String
+  disability        Boolean
+  disabilityType    String? // Optional
+  employed          Boolean
+  employmentStatus  String? // Optional
+  employmentDetails String? // Optional
+  trainingProgram   String
+  studentId         String   @unique
+  student           Student  @relation(fields: [studentId], references: [id])
+
+  @@map("Details")
+}

@@ -1,0 +1,65 @@
+@use "@/app/scss/variables" as *;
+
+#SuperAdminAdmin {
+  @include padding-block;
+
+  .fg {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(medium) {
+      flex-direction: row;
+    }
+  }
+
+  .cards {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    .pink-card {
+      display: flex;
+      justify-content: space-between;
+
+      .title {
+        display: grid;
+        gap: rem(10);
+      }
+    }
+
+    .card {
+      background-color: $c-card;
+      padding: $p-l;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: rem(20);
+
+      .info {
+        display: grid;
+        gap: rem(10);
+
+        .datetime {
+          display: flex;
+          gap: rem(10);
+
+          @include breakpoint(medium) {
+            display: grid;
+          }
+        }
+
+        p {
+          line-height: rem(20);
+        }
+      }
+
+      .settings {
+        display: flex;
+        align-self: flex-end;
+        gap: rem(5);
+      }
+    }
+  }
+}

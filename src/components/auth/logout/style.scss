@@ -1,0 +1,25 @@
+@use "@/app/scss/variables" as *;
+
+#logoutSec {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: rem(10);
+
+  .logout {
+    width: 100%;
+    height: fit-content;
+
+    &:hover {
+      background-color: $c-red;
+    }
+
+    @include breakpoint(medium) {
+      width: 20%;
+    }
+
+    @include breakpoint(large) {
+      width: 15%;
+    }
+  }
+}

@@ -1,0 +1,396 @@
+@use "./variables" as *;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  @include full-width;
+  margin-top: rem(64);
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-Work_Sans), "Segoe UI", Tahoma, Geneva, Verdana,
+    sans-serif;
+  background-color: $c-bg;
+  color: $c-text;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  @include text;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1 {
+  line-height: rem(40);
+}
+
+h2 {
+  line-height: rem(40);
+}
+
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: rem(21);
+  font-weight: 600;
+  color: $c-text-highlight;
+  background-color: $c-button-bg;
+  padding: rem(10) rem(15);
+  border-radius: rem(100);
+  cursor: pointer;
+  text-transform: uppercase;
+  height: fit-content;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    background-color: $c-button-hover;
+  }
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  font-size: rem(20);
+  font-weight: 500;
+  color: $c-text;
+  background-color: $c-link;
+  padding: rem(5) rem(10);
+  border-radius: rem(100);
+
+  &:hover {
+    background-color: $c-link-hover;
+  }
+}
+
+.card {
+  @include fg;
+}
+
+.text-s {
+  font-size: rem(14);
+}
+
+select {
+  background: none;
+  outline: none;
+  border: none;
+  min-width: rem(60);
+  background-color: $c-button-bg;
+  border-radius: $b-radius;
+  padding: $p;
+  font-size: rem(18);
+  font-weight: bold;
+  color: $c-text-highlight;
+
+  option {
+    background-color: $c-bg;
+    outline: none;
+  }
+
+  &:disabled {
+    background-color: $c-select;
+    color: $c-button-bg;
+  }
+}
+
+.loader {
+  animation: rotate 1s $e-quart infinite;
+  color: $c-text-highlight;
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+.fg {
+  @include fg;
+  @include width-height;
+}
+
+.s-text {
+  font-size: rem(12);
+}
+
+.pink-card {
+  background-color: $c-link;
+  padding: $p-l;
+  border-radius: $b-radius;
+}
+
+.highlight {
+  color: $c-text-highlight;
+}
+.highlight-yellow {
+  color: $c-yellow;
+}
+
+@mixin icon-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#delete-button {
+  @include icon-button;
+  background-color: $c-red-light;
+
+  &:hover {
+    background-color: $c-red-hover;
+  }
+}
+
+#settings-button {
+  @include icon-button;
+}
+
+#add-button {
+  @include icon-button;
+}
+
+.popup {
+  position: fixed;
+  z-index: 11;
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  inset: 0;
+  padding-block: calc(rem(64) + rem(10));
+  background-color: $c-dark-trans;
+  @include full-width;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @include breakpoint(medium) {
+    padding-inline: 10vw;
+  }
+
+  @include breakpoint(large) {
+    padding-inline: 32vw;
+  }
+
+  .card {
+    width: 100%;
+    padding: $p;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    .title {
+      background-color: $c-bg;
+      display: flex;
+      justify-content: space-between;
+      border-radius: $b-radius;
+      padding: $p-l;
+
+      button {
+        @include icon-button;
+
+        background-color: $c-red-light;
+
+        &:hover {
+          background-color: $c-red-hover;
+        }
+      }
+    }
+  }
+}
+
+.p-l {
+  padding: $p-l;
+}
+
+.red {
+  color: $c-red;
+}
+
+@mixin input {
+  width: 100%;
+  background-color: $c-bg;
+  outline: none;
+  border: none;
+  color: $c-text;
+  font-size: rem(20);
+  border-radius: $b-radius;
+  padding: $p-l;
+}
+
+input {
+  @include input;
+  padding: rem(10) rem(15);
+  font-size: rem(12);
+  font-family: inherit;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: #ffffff;
+  transition: background-color 5000s ease-in-out 0s;
+  box-shadow: inset 0 0 rem(100) rem(100) $c-bg;
+  caret-color: $c-text;
+}
+
+form {
+  width: 100%;
+  background-color: $c-link;
+  border-radius: $b-radius;
+  padding: $p-l;
+  display: grid;
+  gap: rem(10);
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    display: grid;
+    gap: rem(10);
+
+    input {
+      @include input;
+    }
+  }
+
+  button[type="submit"] {
+    background-color: $c-bg;
+
+    &:hover {
+      background-color: $c-dark-trans;
+    }
+  }
+}
+
+.error-text {
+  color: $c-red;
+}
+
+.info-text {
+  color: $c-yellow;
+}
+
+.success-text {
+  color: $green;
+}
+
+.toast-container {
+  @include full-width;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  padding-top: rem(10);
+  display: flex;
+  flex-direction: column;
+  gap: rem(10);
+  height: fit-content;
+}
+
+.toast {
+  width: 100%;
+  padding: $p-l;
+  border-radius: $b-radius;
+  color: white;
+  display: flex;
+  gap: rem(10);
+  justify-content: space-between;
+  align-items: center;
+
+  @include breakpoint(medium) {
+    width: 50%;
+    align-self: flex-end;
+  }
+
+  @include breakpoint(large) {
+    width: 30%;
+  }
+}
+
+.toast-success {
+  backdrop-filter: blur(rem(10));
+  background-color: rgba(3, 193, 71, 0.5);
+}
+
+.toast-error {
+  background-color: $c-red;
+}
+
+.toast-info {
+  background-color: $c-yellow;
+  color: $c-bg;
+
+  button {
+    color: $c-red;
+  }
+}
+
+.confirm-delete {
+  display: grid;
+  gap: rem(10);
+  padding-top: rem(20);
+  border-top: rem(1) solid $c-text-highlight;
+
+  p {
+    width: 100%;
+
+    @include breakpoint(medium) {
+      width: 50%;
+    }
+
+    @include breakpoint(large) {
+      width: 26%;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    gap: rem(10);
+
+    button {
+      font-size: rem(12);
+
+      &:nth-of-type(1) {
+        background-color: $c-red-light;
+
+        &:hover {
+          background-color: $c-red-hover;
+        }
+      }
+    }
+  }
+}

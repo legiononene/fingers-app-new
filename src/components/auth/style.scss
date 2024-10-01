@@ -1,0 +1,55 @@
+@use "@/app/scss/variables" as *;
+
+#auth {
+  @include padding-block;
+  .fg {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(medium) {
+      flex-direction: row;
+    }
+
+    .title {
+      width: 100%;
+      background-color: $c-bg;
+      border-radius: $b-radius;
+      display: flex;
+      flex-direction: column;
+      gap: rem(10);
+      padding: $p-l;
+      height: fit-content;
+
+      @include breakpoint(medium) {
+        width: 30%;
+      }
+
+      @include breakpoint(large) {
+        width: 60%;
+      }
+    }
+
+    .card {
+      background-color: $c-card;
+      padding: $p-l;
+      width: 100%;
+
+      form {
+        padding: 0;
+        background: none;
+      }
+    }
+
+    .empty {
+      width: 100%;
+      @include breakpoint(medium) {
+        width: 30%;
+      }
+
+      @include breakpoint(large) {
+        width: 60%;
+      }
+    }
+  }
+}

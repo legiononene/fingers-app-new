@@ -1,0 +1,19 @@
+@use "@/app/scss/variables" as *;
+
+#title {
+  width: 100%;
+  background-color: $c-bg;
+  border-radius: $b-radius;
+  display: grid;
+  gap: rem(10);
+  padding: $p-l;
+  height: fit-content;
+
+  @include breakpoint(medium) {
+    width: 30%;
+  }
+
+  @include breakpoint(large) {
+    width: 20%;
+  }
+}

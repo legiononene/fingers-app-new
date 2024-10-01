@@ -1,0 +1,26 @@
+@use "@/app/scss/variables" as *;
+
+#superAdminDashboard {
+  @include padding-block;
+
+  .fg {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(medium) {
+      flex-direction: row;
+    }
+  }
+
+  .card {
+    width: 100%;
+    background-color: $c-card;
+    border-radius: $b-radius;
+    padding: $p-l;
+
+    &:hover {
+      background-color: $c-link-hover;
+    }
+  }
+}
