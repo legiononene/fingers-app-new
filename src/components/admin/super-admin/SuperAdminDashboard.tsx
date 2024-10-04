@@ -6,6 +6,7 @@ import DashboardTitle from "../title/DashboardTitle";
 import { useQuery } from "@apollo/client";
 import { GET_ALL_ADMINS } from "@/graphql/graphql-utils";
 import { useEffect, useState } from "react";
+import { UserRound } from "lucide-react";
 
 type Data = {
   getAllAdmins: Admin[];
@@ -48,7 +49,10 @@ const SuperAdminDashboard = () => {
           }
         />
         <Link href="/superAdmin-dashboard/admin" className="card">
-          <h5 className="highlight">Admins</h5>
+          <h5 className="highlight">
+            <UserRound size={16} strokeWidth={3} />
+            Admins
+          </h5>
           <p className="s-text">
             Total:{" "}
             {error

@@ -1,31 +1,45 @@
 "use client";
 
-import { Settings, Trash, UserRound } from "lucide-react";
-import DashboardTitle from "../../title/DashboardTitle";
-import "./style.scss";
+import "@/components/admin/super-admin/admin/style.scss";
 import { useEffect, useState } from "react";
-import { useQuery } from "@apollo/client";
-import { useMutation } from "@apollo/client";
-import { IST } from "@/utils/time";
-import PinkCard from "@/components/default/pink-card/PinkCard";
+import DashboardTitle from "../../title/DashboardTitle";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  ADD_USER,
+  DELETE_USER,
+  GET_ADMIN,
+  GET_ALL_USERS_BY_ADMIN,
+  UPDATE_USER,
+} from "@/graphql/graphql-utils";
 import {
   ErrorApollo,
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
-import { useToast } from "@/contexts/toastContext";
-import AddUpdateAdminUserPopup from "./addAdmin/AddUpdateAdminUserPopup";
+import PinkCard from "@/components/default/pink-card/PinkCard";
 import {
-  ADD_ADMIN,
-  DELETE_ADMIN,
-  GET_ALL_ADMINS,
-  UPDATE_ADMIN,
-} from "@/graphql/graphql-utils";
+  Eye,
+  GraduationCap,
+  Settings,
+  Shield,
+  Trash,
+  UserRound,
+} from "lucide-react";
+import { IST } from "@/utils/time";
+import { useToast } from "@/contexts/toastContext";
+import AddUpdateAdminUserPopup from "../../super-admin/admin/addAdmin/AddUpdateAdminUserPopup";
+import { useRouter } from "next/navigation";
 
 type Data = {
-  getAllAdmins: Admin[] | undefined;
+  getAdminByAdminToken: Admin;
 };
 
-const SuperAdminAdmin = () => {
+type UserData = {
+  getAllUsersByAdminToken: User[];
+};
+
+const AdminUsers = () => {
+  const [role, setRole] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<{ id: string } | null>(
     null
@@ -35,10 +49,9 @@ const SuperAdminAdmin = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [updateId, setUpdateId] = useState<string>("");
-  const [role, setRole] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   const { addToast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -47,35 +60,47 @@ const SuperAdminAdmin = () => {
     }
   }, []);
 
-  const { data, error, networkStatus } = useQuery<Data>(GET_ALL_ADMINS, {
+  const { data, error, loading } = useQuery<Data>(GET_ADMIN, {
     variables: {
       token,
     },
   });
 
-  const [addAdminByToken, { loading: addAdminLoading, error: addAdminError }] =
-    useMutation<Data>(ADD_ADMIN, {
-      onError: (error) => {
-        if (error.message.includes("Username already exists")) {
-          addToast("Username already exists", "info");
-        } else {
-          addToast(error.message, "error");
-        }
-        return;
-      },
-      refetchQueries: [GET_ALL_ADMINS, "getAllAdmins"],
-      onCompleted: () => {
-        addToast("Admin added successfully", "success");
-        setUserName("");
-        setPassword("");
-        setConfirmPassword("");
-        setFunctionType("");
-      },
-    });
+  const {
+    data: userData,
+    error: userError,
+    loading: userLoading,
+  } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN, {
+    variables: {
+      token,
+    },
+  });
 
-  const [updateAdminById, { loading: updateLoading }] = useMutation<Data>(
-    UPDATE_ADMIN,
-    {
+  const [
+    addUserByAdminToken,
+    { loading: addUserLoading, error: addUserError },
+  ] = useMutation<UserData>(ADD_USER, {
+    onError: (error) => {
+      console.log("error->", error.message);
+      if (error.message.includes("Username already exists")) {
+        addToast("Username already exists", "info");
+      } else {
+        addToast(error.message, "error");
+      }
+      return;
+    },
+    refetchQueries: [GET_ALL_USERS_BY_ADMIN, "getAllUsersByAdminToken"],
+    onCompleted: () => {
+      addToast("User added successfully", "success");
+      setUserName("");
+      setPassword("");
+      setConfirmPassword("");
+      setFunctionType("");
+    },
+  });
+
+  const [updateUserByAdminToken, { loading: updateLoading }] =
+    useMutation<UserData>(UPDATE_USER, {
       onError: (error) => {
         if (error.message.includes("Username already exists")) {
           addToast("Username already exists", "info");
@@ -84,35 +109,34 @@ const SuperAdminAdmin = () => {
         }
         return;
       },
-      refetchQueries: [GET_ALL_ADMINS, "getAllAdmins"],
+      refetchQueries: [GET_ALL_USERS_BY_ADMIN, "getAllUsersByAdminToken"],
       onCompleted: () => {
-        addToast("Admin updated successfully", "success");
+        addToast("User updated successfully", "success");
         setUserName("");
         setPassword("");
         setConfirmPassword("");
         setFunctionType("");
         setUpdateId("");
       },
-    }
-  );
+    });
 
-  const [deleteAdmin, { loading: deleteLoading }] = useMutation<Data>(
-    DELETE_ADMIN,
-    {
-      refetchQueries: [GET_ALL_ADMINS, "getAllAdmins"],
+  const [deleteUserByAdmintoken, { loading: deleteLoading }] =
+    useMutation<UserData>(DELETE_USER, {
+      onError: (error) => {
+        console.log("error->", error); // Log the error for debugging
+        addToast(error.message || "Error deleting user", "error");
+      },
+      refetchQueries: [GET_ALL_USERS_BY_ADMIN, "getAllUsersByAdminToken"],
       onCompleted: () => {
-        addToast("Admin deleted successfully", "success");
+        addToast("User deleted successfully", "success");
         setConfirmDelete(null);
         setSearchTerm("");
       },
-      onError: (error) => {
-        console.log("error->", error); // Log the error for debugging
-        addToast(error.message || "Error deleting admin", "error");
-      },
-    }
-  );
+    });
 
-  const adminData = data?.getAllAdmins;
+  const userDataProp = userData?.getAllUsersByAdminToken;
+
+  console.log("userDataProp->", userDataProp);
 
   const handleAddButton = () => {
     setUserName("");
@@ -127,19 +151,17 @@ const SuperAdminAdmin = () => {
     setFunctionType("update");
   };
 
-  if (networkStatus == 1) {
+  if (loading && userLoading) {
     return <NetworkStatusApollo />;
   }
 
-  if (error) {
-    return <ErrorApollo error={error} />;
+  if (error && userError) {
+    return <ErrorApollo error={error ? error : userError} />;
   }
-
-  //console.log("data->", adminData);
 
   return (
     <>
-      <section id="SuperAdminAdmin">
+      <section id="adminUsers">
         <div className="fg">
           <DashboardTitle
             role={
@@ -153,50 +175,69 @@ const SuperAdminAdmin = () => {
               role === "superAdmin"
                 ? "legionOne"
                 : role === "admin"
-                ? "Admin"
+                ? `${data?.getAdminByAdminToken.userName}`
                 : "User"
             }
           />
           <div className="cards">
             <PinkCard
-              title="Admin"
+              title="Users"
               icon={<UserRound size={16} strokeWidth={3} />}
-              data={adminData}
+              data={userDataProp}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               handleAddButton={handleAddButton}
             />
             {data &&
-            data.getAllAdmins &&
-            adminData &&
-            data.getAllAdmins.length > 0 ? (
-              adminData
-                .filter((admin) =>
-                  admin.userName
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+            userData?.getAllUsersByAdminToken &&
+            userDataProp &&
+            userData.getAllUsersByAdminToken.length > 0 ? (
+              userDataProp
+                .filter((user) =>
+                  user.userName.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .sort((a, b) => a.userName.localeCompare(b.userName))
-                .map((admin: Admin, index: number) => (
+                .map((user: User, index: number) => (
                   <>
                     <div className="card" key={index}>
                       <div className="info">
-                        <p className="highlight-yellow">{admin.userName}</p>
+                        <p className="highlight-yellow">
+                          {" "}
+                          {user.userName} <span className="divider">|</span>{" "}
+                          <span className="stats stats-b">
+                            <Shield size={14} strokeWidth={3} /> :{" "}
+                            {user.batches ? user.batches.length : "N/A"}{" "}
+                          </span>
+                          <span className="divider">|</span>{" "}
+                          <span className="stats stats-s">
+                            <GraduationCap size={14} strokeWidth={3} /> :{" "}
+                            {user.batches
+                              ? user.batches.reduce(
+                                  (totalStudents, batch) =>
+                                    totalStudents +
+                                    (batch.students
+                                      ? batch.students.length
+                                      : 0),
+                                  0
+                                )
+                              : "N/A"}
+                          </span>
+                        </p>
                         <div className="datetime">
                           <p className="text-s">
                             Created At:{" "}
                             <span className="highlight text-xs">
-                              {new Date(parseInt(admin.createdAt))
+                              {new Date(parseInt(user.createdAt))
                                 .toLocaleString("en-IN", IST)
-                                .replace(",", " -")}
+                                .replace(",", " |")}
                             </span>
                           </p>
                           <p className="text-s">
                             Updated At:{" "}
                             <span className="highlight text-xs">
-                              {new Date(parseInt(admin.updatedAt))
+                              {new Date(parseInt(user.updatedAt))
                                 .toLocaleString("en-IN", IST)
-                                .replace(",", " -")}
+                                .replace(",", " |")}
                             </span>
                           </p>
                         </div>
@@ -205,10 +246,10 @@ const SuperAdminAdmin = () => {
                         <button
                           id="delete-button"
                           onClick={() => {
-                            if (confirmDelete?.id === admin.id) {
+                            if (confirmDelete?.id === user.id) {
                               setConfirmDelete(null);
                             } else {
-                              setConfirmDelete({ id: admin.id });
+                              setConfirmDelete({ id: user.id });
                             }
                           }}
                           disabled={deleteLoading}
@@ -218,13 +259,21 @@ const SuperAdminAdmin = () => {
                         <button
                           id="settings-button"
                           onClick={() => {
-                            handleUpdateButton(admin.userName, admin.id);
+                            handleUpdateButton(user.userName, user.id);
                           }}
                         >
                           <Settings />
                         </button>
+                        <button
+                          onClick={() =>
+                            router.push(`/admin-dashboard/users/${user.id}`)
+                          }
+                        >
+                          <Eye />
+                        </button>
                       </div>
-                      {confirmDelete?.id === admin.id && (
+
+                      {confirmDelete?.id === user.id && (
                         <div className="confirm-delete">
                           <p className="info-text">
                             Are you sure you want to delete this admin?
@@ -232,10 +281,10 @@ const SuperAdminAdmin = () => {
                           <div className="buttons">
                             <button
                               onClick={() => {
-                                deleteAdmin({
+                                deleteUserByAdmintoken({
                                   variables: {
                                     token: token,
-                                    adminId: admin.id,
+                                    deleteId: user.id,
                                   },
                                 });
                               }}
@@ -253,28 +302,29 @@ const SuperAdminAdmin = () => {
                   </>
                 ))
             ) : (
-              <div className="card">No admins available.</div>
+              <div className="card">No users available.</div>
             )}
           </div>
         </div>
       </section>
-
       {functionType !== "" && (
         <AddUpdateAdminUserPopup
           setFunctionType={setFunctionType}
           handleSubmitFunction={
-            functionType === "add" ? addAdminByToken : updateAdminById
+            functionType === "add"
+              ? addUserByAdminToken
+              : updateUserByAdminToken
           }
           id={updateId}
-          error={addAdminError}
+          error={addUserError}
           userName={userName}
           password={password}
           confirmPassword={confirmPassword}
           setUserName={setUserName}
           setPassword={setPassword}
           setConfirmPassword={setConfirmPassword}
-          loading={functionType === "add" ? addAdminLoading : updateLoading}
-          title={functionType === "add" ? "Add Admin" : "Update Admin"}
+          loading={functionType === "add" ? addUserLoading : updateLoading}
+          title={functionType === "add" ? "Add User" : "Update User"}
           functionType={functionType}
           token={token}
         />
@@ -283,4 +333,4 @@ const SuperAdminAdmin = () => {
   );
 };
 
-export default SuperAdminAdmin;
+export default AdminUsers;

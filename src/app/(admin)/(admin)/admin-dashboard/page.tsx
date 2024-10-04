@@ -1,5 +1,11 @@
+import Admindashboard from "@/components/admin/admin-admin/Admindashboard";
+
 const page = () => {
-  return <>Admin admin</>;
+  return (
+    <>
+      <Admindashboard />
+    </>
+  );
 };
 
 export default page;

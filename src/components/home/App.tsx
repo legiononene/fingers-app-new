@@ -7,7 +7,7 @@ import { useGesture } from "@use-gesture/react";
 import appDB from "@/database/appDS";
 
 const App = () => {
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [lockedScale, setLockedScale] = useState<number | null>(1); // Set default to 1 (locked by default)
   const [loadingScale, setLoadingScale] = useState<boolean>(false);
   const [imageIndex, setImageIndex] = useState(0);
@@ -151,14 +151,6 @@ const App = () => {
               )}
             </button>
             <div className="set-priority">
-              <select name="primary" disabled={!priority}>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-              </select>
               <button
                 disabled={!priority}
                 className={priority ? "active" : ""}
@@ -167,7 +159,7 @@ const App = () => {
                 {loadingPriority ? (
                   <RefreshCw size={20} className="loader" />
                 ) : (
-                  "Set"
+                  "Set Priority"
                 )}
               </button>
             </div>

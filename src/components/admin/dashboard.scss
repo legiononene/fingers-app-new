@@ -1,6 +1,7 @@
 @use "@/app/scss/variables" as *;
 
-#superAdminDashboard {
+#superAdminDashboard,
+#adminDashboard {
   @include padding-block;
 
   .fg {
@@ -22,5 +23,18 @@
     &:hover {
       background-color: $c-link-hover;
     }
+
+    h5 {
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+    }
+  }
+
+  .right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
   }
 }

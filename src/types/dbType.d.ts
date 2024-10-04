@@ -48,7 +48,7 @@ type Batch = {
   name: string;
   inTime: string;
   outTime: string;
-  Students: Student[];
+  students: Student[];
   state: boolean; // true if batch is active
 };
 
@@ -58,7 +58,7 @@ type User = {
   updatedAt: string;
   userName: string;
   password: string;
-  Batches: Batch[];
+  batches: Batch[];
   role: "User";
 };
 

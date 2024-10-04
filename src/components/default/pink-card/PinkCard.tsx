@@ -2,7 +2,8 @@ import { UserRoundPlus } from "lucide-react";
 
 type Props = {
   title: string;
-  data: Admin[] | undefined;
+  icon: React.ReactNode;
+  data: Admin[] | User[] | undefined;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   handleAddButton: () => void;
@@ -10,6 +11,7 @@ type Props = {
 
 const PinkCard = ({
   title,
+  icon,
   data,
   searchTerm,
   setSearchTerm,
@@ -23,6 +25,7 @@ const PinkCard = ({
     <div className="pink-card">
       <div className="title">
         <h5>
+          {icon}
           {title}: <span>{data ? data.length : "None"}</span>
         </h5>
         <input

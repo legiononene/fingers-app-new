@@ -39,6 +39,8 @@ const Auth = () => {
       if (error.message.includes("Password invalid")) {
         addToast("Invalid Uesrname or Password", "error");
         setErrorMessage("Invalid Uesrname or Password");
+        setUsername("");
+        setPassword("");
       } else {
         addToast(error.message, "error");
       }

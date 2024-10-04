@@ -151,11 +151,20 @@ select {
   background-color: $c-link;
   padding: $p-l;
   border-radius: $b-radius;
+
+  .title {
+    h5 {
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+    }
+  }
 }
 
 .highlight {
   color: $c-text-highlight;
 }
+
 .highlight-yellow {
   color: $c-yellow;
 }
@@ -393,4 +402,22 @@ form {
       }
     }
   }
+}
+
+.divider {
+  color: $c-button-bg;
+}
+
+.stats {
+  font-size: rem(18);
+  &-b {
+    color: $orange;
+  }
+  &-s {
+    color: $blue;
+  }
+}
+
+.text-xs {
+  font-size: rem(10);
 }

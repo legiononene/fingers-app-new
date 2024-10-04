@@ -1,6 +1,7 @@
 @use "@/app/scss/variables" as *;
 
-#SuperAdminAdmin {
+#SuperAdminAdmin,
+#adminUsers {
   @include padding-block;
 
   .fg {

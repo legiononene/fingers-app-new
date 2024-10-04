@@ -6,7 +6,7 @@ import { ApolloError } from "@apollo/client";
 import { useToast } from "@/contexts/toastContext";
 
 type Variables = {
-  updateAdminId?: string;
+  updateId?: string;
   userName: string;
   password: string;
   token: string;
@@ -67,7 +67,7 @@ const AddUpdateAdminUserPopup = ({
     } else if (functionType === "update" && token) {
       handleSubmitFunction({
         variables: {
-          updateAdminId: id,
+          updateId: id,
           userName,
           password,
           token,
