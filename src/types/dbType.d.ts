@@ -45,7 +45,7 @@ type Batch = {
   id: string; // (uuid)
   createdAt: string;
   updatedAt: string;
-  name: string;
+  batchName: string;
   inTime: string;
   outTime: string;
   students: Student[];

@@ -17,6 +17,7 @@ import {
 } from "@/components/default/error-loading/ErrorLoading";
 import PinkCard from "@/components/default/pink-card/PinkCard";
 import {
+  ArrowLeft,
   Eye,
   GraduationCap,
   Settings,
@@ -28,6 +29,7 @@ import { IST } from "@/utils/time";
 import { useToast } from "@/contexts/toastContext";
 import AddUpdateAdminUserPopup from "../../super-admin/admin/addAdmin/AddUpdateAdminUserPopup";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type Data = {
   getAdminByAdminToken: Admin;
@@ -123,7 +125,7 @@ const AdminUsers = () => {
   const [deleteUserByAdmintoken, { loading: deleteLoading }] =
     useMutation<UserData>(DELETE_USER, {
       onError: (error) => {
-        console.log("error->", error); // Log the error for debugging
+        console.log("error->", error);
         addToast(error.message || "Error deleting user", "error");
       },
       refetchQueries: [GET_ALL_USERS_BY_ADMIN, "getAllUsersByAdminToken"],
@@ -136,7 +138,7 @@ const AdminUsers = () => {
 
   const userDataProp = userData?.getAllUsersByAdminToken;
 
-  console.log("userDataProp->", userDataProp);
+  //console.log("userDataProp->", userDataProp);
 
   const handleAddButton = () => {
     setUserName("");
@@ -197,9 +199,9 @@ const AdminUsers = () => {
                   user.userName.toLowerCase().includes(searchTerm.toLowerCase())
                 )
                 .sort((a, b) => a.userName.localeCompare(b.userName))
-                .map((user: User, index: number) => (
+                .map((user: User) => (
                   <>
-                    <div className="card" key={index}>
+                    <div className="card" key={user.id}>
                       <div className="info">
                         <p className="highlight-yellow">
                           {" "}
@@ -273,13 +275,14 @@ const AdminUsers = () => {
                         </button>
                       </div>
 
-                      {confirmDelete?.id === user.id && (
+                      {confirmDelete && confirmDelete?.id === user.id && (
                         <div className="confirm-delete">
                           <p className="info-text">
                             Are you sure you want to delete this admin?
                           </p>
                           <div className="buttons">
                             <button
+                              className="delete"
                               onClick={() => {
                                 deleteUserByAdmintoken({
                                   variables: {

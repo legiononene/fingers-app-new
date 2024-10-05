@@ -177,9 +177,9 @@ const SuperAdminAdmin = () => {
                     .includes(searchTerm.toLowerCase())
                 )
                 .sort((a, b) => a.userName.localeCompare(b.userName))
-                .map((admin: Admin, index: number) => (
+                .map((admin: Admin) => (
                   <>
-                    <div className="card" key={index}>
+                    <div className="card" key={admin.id}>
                       <div className="info">
                         <p className="highlight-yellow">{admin.userName}</p>
                         <div className="datetime">

@@ -136,3 +136,47 @@ export const DELETE_USER = gql`
     }
   }
 `;
+
+export const GET_ALL_BATCHES_BY_USER_ID = gql`
+  query GetAllBatchesByUserId($token: String!, $userId: String) {
+    getAllBatchesByUserId(token: $token, id: $userId) {
+      batchName
+      createdAt
+      id
+      inTime
+      outTime
+      state
+      students {
+        studentName
+      }
+      updatedAt
+    }
+  }
+`;
+
+export const GET_USER_BY_USER_ID = gql`
+  query GetUserByUserId($token: String!, $userId: ID!) {
+    getUserByUserId(token: $token, id: $userId) {
+      userName
+      batches {
+        batchName
+      }
+    }
+  }
+`;
+
+export const GRT_BATCH_BY_BATCH_ID = gql`
+  query GetBatchByBatchId($token: String!, $batchId: ID!) {
+    getBatchByBatchId(token: $token, id: $batchId) {
+      userName
+    }
+  }
+`;
+
+export const ASIGN_BATCH_TO_USER = gql`
+  mutation AssignBatchToUser($token: String!, $userId: ID!, $batchId: ID!) {
+    assignBatchToUser(token: $token, userId: $userId, batchId: $batchId) {
+      batchName
+    }
+  }
+`;

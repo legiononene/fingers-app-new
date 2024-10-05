@@ -87,9 +87,22 @@ a {
   background-color: $c-link;
   padding: rem(5) rem(10);
   border-radius: rem(100);
+  height: fit-content;
 
   &:hover {
     background-color: $c-link-hover;
+  }
+}
+
+.link-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  //width: fit-content;
+
+  background-color: $c-button-bg;
+  &:hover {
+    background-color: $c-button-hover;
   }
 }
 
@@ -114,8 +127,9 @@ select {
   color: $c-text-highlight;
 
   option {
-    background-color: $c-bg;
+    background-color: $lightBorder;
     outline: none;
+    color: $c-bg;
   }
 
   &:disabled {
@@ -230,7 +244,6 @@ select {
 
       button {
         @include icon-button;
-
         background-color: $c-red-light;
 
         &:hover {
@@ -368,9 +381,14 @@ form {
   }
 }
 
-.confirm-delete {
+.asign-select {
+  font-size: rem(12);
+}
+
+.confirm-delete,
+.asign {
   display: grid;
-  gap: rem(10);
+  gap: rem(20);
   padding-top: rem(20);
   border-top: rem(1) solid $c-text-highlight;
 
@@ -392,13 +410,16 @@ form {
 
     button {
       font-size: rem(12);
+      display: flex;
+      align-items: center;
+      gap: rem(5);
+    }
 
-      &:nth-of-type(1) {
-        background-color: $c-red-light;
+    .delete {
+      background-color: $c-red-light;
 
-        &:hover {
-          background-color: $c-red-hover;
-        }
+      &:hover {
+        background-color: $c-red-hover;
       }
     }
   }
@@ -419,5 +440,5 @@ form {
 }
 
 .text-xs {
-  font-size: rem(10);
+  font-size: rem(12);
 }

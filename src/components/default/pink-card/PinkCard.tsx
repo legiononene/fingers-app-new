@@ -1,12 +1,12 @@
 import { UserRoundPlus } from "lucide-react";
 
 type Props = {
-  title: string;
+  title: string | undefined;
   icon: React.ReactNode;
-  data: Admin[] | User[] | undefined;
+  data: Admin[] | User[] | Batch[] | undefined;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
-  handleAddButton: () => void;
+  handleAddButton?: () => void;
 };
 
 const PinkCard = ({
@@ -36,9 +36,11 @@ const PinkCard = ({
           className="search-input"
         />
       </div>
-      <button id="add-button" onClick={handleAddButton}>
-        <UserRoundPlus />
-      </button>
+      {handleAddButton && (
+        <button id="add-button" onClick={handleAddButton}>
+          <UserRoundPlus />
+        </button>
+      )}
     </div>
   );
 };
