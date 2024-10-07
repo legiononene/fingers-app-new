@@ -1,8 +1,18 @@
 "use client";
 
-import DashboardTitle from "@/components/admin/title/DashboardTitle";
-import { useEffect, useState } from "react";
 import "@/components/admin/super-admin/admin/style.scss";
+import DashboardTitle from "../../title/DashboardTitle";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/contexts/authContext";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  ASIGN_BATCH_TO_USER,
+  CHANGE_STATE_OF_BATCH,
+  GET_ADMIN,
+  GET_ALL_BATCHES_BY_ADMIN,
+  GET_ALL_BATCHES_BY_USER_ID,
+  GET_ALL_USERS_BY_ADMIN,
+} from "@/graphql/graphql-utils";
 import PinkCard from "@/components/default/pink-card/PinkCard";
 import {
   ArrowLeft,
@@ -10,60 +20,46 @@ import {
   GraduationCap,
   RefreshCw,
   Repeat,
-  UserRound,
+  Shield,
 } from "lucide-react";
-import Link from "next/link";
-import {
-  ASIGN_BATCH_TO_USER,
-  CHANGE_STATE_OF_BATCH,
-  GET_ADMIN,
-  GET_ALL_BATCHES_BY_USER_ID,
-  GET_ALL_USERS_BY_ADMIN,
-  GET_USER_BY_USER_ID,
-} from "@/graphql/graphql-utils";
-import { useMutation, useQuery } from "@apollo/client";
+import { IST } from "@/utils/time";
 import {
   ErrorApollo,
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
-import { IST } from "@/utils/time";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/contexts/toastContext";
-import { useAuth } from "@/contexts/authContext";
+import Link from "next/link";
 
 type AdminData = {
   getAdminByAdminToken: Admin;
 };
 
-type Data = {
-  getAllBatchesByUserId: Batch[];
-};
-
-type UserData = {
-  getUserByUserId: User;
+type BatchData = {
+  getAllBatchesByAdminId: Batch[];
 };
 
 type UsersData = {
   getAllUsersByAdminToken: User[];
 };
 
-const AdminUser = ({ slug }: { slug: string }) => {
+const AdminBatches = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [asign, setAsign] = useState<{ id: string } | null>(null);
-  const [asignUserId, setAsignUserId] = useState<string | null>(slug);
   const [state, setState] = useState<string | null>(null);
+  const [asign, setAsign] = useState<{ id: string } | null>(null);
+  const [asignUserId, setAsignUserId] = useState<string | null>(null);
 
   const router = useRouter();
   const { addToast } = useToast();
+
+  const { token } = useAuth();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       setRole(localStorage.getItem("role"));
     }
   }, []);
-
-  const { token } = useAuth();
 
   const {
     data: adminData,
@@ -75,19 +71,16 @@ const AdminUser = ({ slug }: { slug: string }) => {
     },
   });
 
-  const { data, error, loading, refetch } = useQuery<Data>(
-    GET_ALL_BATCHES_BY_USER_ID,
-    {
-      variables: {
-        token,
-        userId: slug,
-      },
-    }
-  );
-
-  useEffect(() => {
-    refetch();
-  }, []);
+  const {
+    data: batchData,
+    error: batchError,
+    loading: batchLoading,
+    refetch,
+  } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN, {
+    variables: {
+      token,
+    },
+  });
 
   const {
     data: allUsersData,
@@ -99,26 +92,28 @@ const AdminUser = ({ slug }: { slug: string }) => {
     },
   });
 
-  //console.log("token->", token);
-
   const usersDataProp = allUsersData?.getAllUsersByAdminToken;
 
-  //console.log("usersDataProp->", usersDataProp);
+  const [changeStateOfBatchByBatchIdByAdmin, { loading: changeStateLoading }] =
+    useMutation<BatchData>(CHANGE_STATE_OF_BATCH, {
+      onError: (error) => {
+        console.log("error->", error);
+        addToast(error.message || "Error changing state", "error");
+      },
+      refetchQueries: [
+        {
+          query: GET_ADMIN,
+          variables: { token },
+        },
+        { query: GET_ALL_BATCHES_BY_ADMIN, variables: { token } },
+      ],
 
-  const {
-    data: userData,
-    error: userError,
-    loading: userLoading,
-  } = useQuery<UserData>(GET_USER_BY_USER_ID, {
-    variables: {
-      token,
-      userId: slug,
-    },
-  });
+      onCompleted: () => {
+        addToast("State changed successfully", "success");
+      },
+    });
 
-  //console.log("userData->", userData);
-
-  const [asignBatchToUser, { loading: assignLoading }] = useMutation<Data>(
+  const [asignBatchToUser, { loading: assignLoading }] = useMutation<BatchData>(
     ASIGN_BATCH_TO_USER,
     {
       onError: (error) => {
@@ -127,11 +122,10 @@ const AdminUser = ({ slug }: { slug: string }) => {
       },
       refetchQueries: [
         {
-          query: GET_ALL_BATCHES_BY_USER_ID,
-          variables: { token, userId: slug },
+          query: GET_ADMIN,
+          variables: { token },
         },
-        { query: GET_ALL_USERS_BY_ADMIN, variables: { token } },
-        { query: GET_USER_BY_USER_ID, variables: { token, userId: slug } },
+        { query: GET_ALL_BATCHES_BY_ADMIN, variables: { token } },
       ],
       onCompleted: () => {
         addToast("Batch asigned successfully", "success");
@@ -140,39 +134,22 @@ const AdminUser = ({ slug }: { slug: string }) => {
     }
   );
 
-  const [changeStateOfBatchByBatchIdByAdmin, { loading: changeStateLoading }] =
-    useMutation<Data>(CHANGE_STATE_OF_BATCH, {
-      onError: (error) => {
-        console.log("error->", error);
-        addToast(error.message || "Error changing state", "error");
-      },
-      refetchQueries: [
-        {
-          query: GET_ALL_BATCHES_BY_USER_ID,
-          variables: { token, userId: slug },
-        },
-      ],
-      onCompleted: () => {
-        addToast("State changed successfully", "success");
-      },
-    });
+  useEffect(() => {
+    refetch();
+  }, []);
 
-  const userDataProp = userData?.getUserByUserId.batches;
-
-  const BatchesData = data?.getAllBatchesByUserId;
-
-  //console.log("BatchesData->", BatchesData);
-
-  if (loading) {
+  if (batchLoading) {
     return <NetworkStatusApollo />;
   }
 
-  if (error) {
-    return <ErrorApollo error={error} />;
+  if (batchError) {
+    return <ErrorApollo error={batchError} />;
   }
 
+  const batchdataProp = batchData?.getAllBatchesByAdminId;
+
   return (
-    <section id="adminUser">
+    <section id="adminBatches">
       <div className="fg">
         <DashboardTitle
           role={
@@ -197,27 +174,22 @@ const AdminUser = ({ slug }: { slug: string }) => {
 
         <div className="cards">
           <div className="links">
-            <Link href="/admin-dashboard/" className="link-back ">
+            <Link href="/admin-dashboard/" className="link-back">
               <ArrowLeft size={14} /> Dashboard
-            </Link>
-            <Link href="/admin-dashboard/users/" className="link-back ">
-              <ArrowLeft size={14} /> All Users
             </Link>
           </div>
           <PinkCard
-            title={userData?.getUserByUserId.userName}
-            icon={<UserRound size={16} strokeWidth={3} />}
-            data={userDataProp}
+            title="Batches"
+            icon={<Shield size={14} strokeWidth={3} />}
+            data={batchdataProp}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
           />
-          {data &&
-          data.getAllBatchesByUserId &&
-          BatchesData &&
-          data.getAllBatchesByUserId.length > 0 ? (
-            BatchesData.filter((batch) =>
-              batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
-            )
+          {adminData && batchdataProp && batchdataProp.length > 0 ? (
+            batchdataProp
+              .filter((batch) =>
+                batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
+              )
               .sort((a, b) => a.batchName.localeCompare(b.batchName))
               .map((batch: Batch) => (
                 <div className="card" key={batch.id}>
@@ -268,6 +240,12 @@ const AdminUser = ({ slug }: { slug: string }) => {
                           {batch.outTime}
                         </span>
                       </p>
+                      <p className="text-s">
+                        User:{" "}
+                        <span className="highlight text-xs">
+                          {batch.user.userName}
+                        </span>
+                      </p>
                     </div>
                   </div>
                   <div className="settings">
@@ -294,6 +272,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                           setAsign(null);
                         } else {
                           setAsign({ id: batch.id });
+                          setAsignUserId(batch.userId);
                         }
                       }}
                     >
@@ -301,9 +280,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                     </button>
                     <button
                       onClick={() =>
-                        router.push(
-                          `/admin-dashboard/users/${slug}/${batch.id}`
-                        )
+                        router.push(`/admin-dashboard/batches/${batch.id}`)
                       }
                     >
                       <Eye />
@@ -318,7 +295,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                       <div className="buttons">
                         <select
                           className="asign-select"
-                          disabled={usersDataProp?.length === 0}
+                          disabled={batchdataProp?.length === 0}
                           value={asignUserId || ""}
                           onChange={(e) => setAsignUserId(e.target.value)}
                         >
@@ -334,7 +311,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                           disabled={
                             !asignUserId ||
                             assignLoading ||
-                            asignUserId === slug
+                            asignUserId === batch.userId
                           }
                           onClick={() => {
                             asignBatchToUser({
@@ -373,4 +350,4 @@ const AdminUser = ({ slug }: { slug: string }) => {
   );
 };
 
-export default AdminUser;
+export default AdminBatches;

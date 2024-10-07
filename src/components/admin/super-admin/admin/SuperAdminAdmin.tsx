@@ -20,6 +20,7 @@ import {
   GET_ALL_ADMINS,
   UPDATE_ADMIN,
 } from "@/graphql/graphql-utils";
+import { useAuth } from "@/contexts/authContext";
 
 type Data = {
   getAllAdmins: Admin[] | undefined;
@@ -36,16 +37,16 @@ const SuperAdminAdmin = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [updateId, setUpdateId] = useState<string>("");
   const [role, setRole] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
 
   const { addToast } = useToast();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setToken(localStorage.getItem("token"));
       setRole(localStorage.getItem("role"));
     }
   }, []);
+
+  const { token } = useAuth();
 
   const { data, error, networkStatus } = useQuery<Data>(GET_ALL_ADMINS, {
     variables: {

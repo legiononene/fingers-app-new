@@ -34,11 +34,12 @@ type Student = {
   id: string; // (uuid)
   createdAt: string;
   updatedAt: string;
-  name: string;
+  studentName: string;
   aadhar_number: number; // last 8 digits
   state: string[]; // If IN then ["IN"] | if IN and OUT then ["IN", "OUT"] | if ABSENT then [""]
-  fingerPrints: FingerPrint[];
-  Details?: Details;
+  fingerprints: FingerPrint[];
+  Details?: Details | null;
+  batchId: string;
 };
 
 type Batch = {
@@ -50,6 +51,8 @@ type Batch = {
   outTime: string;
   students: Student[];
   state: boolean; // true if batch is active
+  userId: string;
+  user: User;
 };
 
 type User = {

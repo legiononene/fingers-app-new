@@ -7,21 +7,22 @@ import { useQuery } from "@apollo/client";
 import { GET_ALL_ADMINS } from "@/graphql/graphql-utils";
 import { useEffect, useState } from "react";
 import { UserRound } from "lucide-react";
+import { useAuth } from "@/contexts/authContext";
 
 type Data = {
   getAllAdmins: Admin[];
 };
 
 const SuperAdminDashboard = () => {
-  const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setToken(localStorage.getItem("token"));
       setRole(localStorage.getItem("role"));
     }
   }, []);
+
+  const { token } = useAuth();
 
   const { data, error, loading } = useQuery<Data>(GET_ALL_ADMINS, {
     variables: {

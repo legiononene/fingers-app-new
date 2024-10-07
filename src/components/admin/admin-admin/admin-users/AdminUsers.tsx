@@ -29,6 +29,7 @@ import { IST } from "@/utils/time";
 import { useToast } from "@/contexts/toastContext";
 import AddUpdateAdminUserPopup from "../../super-admin/admin/addAdmin/AddUpdateAdminUserPopup";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/authContext";
 import Link from "next/link";
 
 type Data = {
@@ -41,7 +42,6 @@ type UserData = {
 
 const AdminUsers = () => {
   const [role, setRole] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<{ id: string } | null>(
     null
@@ -57,12 +57,12 @@ const AdminUsers = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setToken(localStorage.getItem("token"));
       setRole(localStorage.getItem("role"));
     }
   }, []);
+  const { token } = useAuth();
 
-  const { data, error, loading } = useQuery<Data>(GET_ADMIN, {
+  const { data, error, loading, refetch } = useQuery<Data>(GET_ADMIN, {
     variables: {
       token,
     },
@@ -72,11 +72,17 @@ const AdminUsers = () => {
     data: userData,
     error: userError,
     loading: userLoading,
+    refetch: userRefetch,
   } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN, {
     variables: {
       token,
     },
   });
+
+  useEffect(() => {
+    refetch();
+    userRefetch();
+  }, []);
 
   const [
     addUserByAdminToken,
@@ -182,6 +188,11 @@ const AdminUsers = () => {
             }
           />
           <div className="cards">
+            <div className="links">
+              <Link href="/admin-dashboard/" className="link-back">
+                <ArrowLeft size={14} /> Dashboard
+              </Link>
+            </div>
             <PinkCard
               title="Users"
               icon={<UserRound size={16} strokeWidth={3} />}

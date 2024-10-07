@@ -1,9 +1,9 @@
-import { UserRoundPlus } from "lucide-react";
+import { Search, UserRoundPlus } from "lucide-react";
 
 type Props = {
   title: string | undefined;
   icon: React.ReactNode;
-  data: Admin[] | User[] | Batch[] | undefined;
+  data: Admin[] | User[] | Batch[] | Student[] | undefined;
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   handleAddButton?: () => void;
@@ -21,6 +21,14 @@ const PinkCard = ({
     setSearchTerm(e.target.value);
   };
 
+  const isStudentArray = (arr: any[]): arr is Student[] =>
+    arr.length > 0 && "aadhar_number" in arr[0];
+  //console.log("data->", data);
+  const placeHolder =
+    Array.isArray(data) && isStudentArray(data)
+      ? "Search by Name or Aadhar..."
+      : "Search by Name...";
+
   return (
     <div className="pink-card">
       <div className="title">
@@ -28,13 +36,16 @@ const PinkCard = ({
           {icon}
           {title}: <span>{data ? data.length : "None"}</span>
         </h5>
-        <input
-          type="text"
-          placeholder="Search by username..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="search-input"
-        />
+        <div className="input-block">
+          <input
+            type="text"
+            placeholder={placeHolder}
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="search-input"
+          />
+          <Search className="search-icon" />
+        </div>
       </div>
       {handleAddButton && (
         <button id="add-button" onClick={handleAddButton}>

@@ -98,9 +98,9 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  //width: fit-content;
-
   background-color: $c-button-bg;
+  font-size: rem(12);
+
   &:hover {
     background-color: $c-button-hover;
   }
@@ -122,8 +122,9 @@ select {
   background-color: $c-button-bg;
   border-radius: $b-radius;
   padding: $p;
+  padding-inline: rem(20);
   font-size: rem(18);
-  font-weight: bold;
+  font-weight: 500;
   color: $c-text-highlight;
 
   option {
@@ -167,10 +168,38 @@ select {
   border-radius: $b-radius;
 
   .title {
+    width: 100%;
+
     h5 {
       display: flex;
       align-items: center;
       gap: rem(5);
+    }
+
+    .input-block {
+      position: relative;
+      display: flex;
+      align-items: center;
+
+      .search-icon {
+        position: absolute;
+        right: rem(14);
+
+        @include breakpoint(medium) {
+          position: relative;
+          right: rem(34);
+        }
+      }
+    }
+
+    input {
+      width: 100%;
+      padding-block: rem(12);
+      padding-right: rem(44);
+
+      @include breakpoint(medium) {
+        max-width: rem(250);
+      }
     }
   }
 }
@@ -181,6 +210,9 @@ select {
 
 .highlight-yellow {
   color: $c-yellow;
+  display: flex;
+  gap: rem(5);
+  align-items: center;
 }
 
 @mixin icon-button {
@@ -383,6 +415,8 @@ form {
 
 .asign-select {
   font-size: rem(12);
+  padding: $p;
+  font-weight: bold;
 }
 
 .confirm-delete,
@@ -407,6 +441,7 @@ form {
   .buttons {
     display: flex;
     gap: rem(10);
+    flex-wrap: wrap;
 
     button {
       font-size: rem(12);
@@ -436,6 +471,14 @@ form {
   }
   &-s {
     color: $blue;
+  }
+  &-active {
+    color: $c-text-highlight;
+    font-size: rem(28);
+  }
+  &-inActive {
+    color: $c-red;
+    font-size: rem(28);
   }
 }
 

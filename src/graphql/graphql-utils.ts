@@ -83,6 +83,20 @@ export const GET_ALL_BATCHES_BY_ADMIN = gql`
   query getAllBatchesByAdmin($token: String!) {
     getAllBatchesByAdminId(token: $token) {
       batchName
+      createdAt
+      id
+      inTime
+      outTime
+      state
+      userId
+      user {
+        userName
+        id
+      }
+      students {
+        studentName
+      }
+      updatedAt
     }
   }
 `;
@@ -169,6 +183,10 @@ export const GRT_BATCH_BY_BATCH_ID = gql`
   query GetBatchByBatchId($token: String!, $batchId: ID!) {
     getBatchByBatchId(token: $token, id: $batchId) {
       userName
+      students {
+        aadhar_number
+        studentName
+      }
     }
   }
 `;
@@ -177,6 +195,118 @@ export const ASIGN_BATCH_TO_USER = gql`
   mutation AssignBatchToUser($token: String!, $userId: ID!, $batchId: ID!) {
     assignBatchToUser(token: $token, userId: $userId, batchId: $batchId) {
       batchName
+    }
+  }
+`;
+
+export const CHANGE_STATE_OF_BATCH = gql`
+  mutation ChangeStateOfBatchByBatchIdByAdmin(
+    $token: String!
+    $state: Boolean!
+    $batchId: ID!
+  ) {
+    changeStateOfBatchByBatchIdByAdmin(
+      token: $token
+      state: $state
+      batchId: $batchId
+    ) {
+      batchName
+      state
+    }
+  }
+`;
+
+export const GET_BATCH_BY_BATCH_ID = gql`
+  query GetBatchByBatchId($token: String!, $batchId: ID!) {
+    getBatchByBatchId(token: $token, id: $batchId) {
+      batchName
+      createdAt
+      id
+      inTime
+      outTime
+      state
+      userId
+      updatedAt
+      students {
+        studentName
+        aadhar_number
+        batchId
+        createdAt
+        updatedAt
+        state
+        id
+        fingerprints {
+          id
+          image
+          priority
+          studentId
+        }
+        details {
+          aadhar_number
+          address
+          castCategory
+          disability
+          disabilityType
+          dob
+          domicileDistrict
+          domicileState
+          email
+          employed
+          employmentDetails
+          employmentStatus
+          fatherGuardian
+          gender
+          id
+          idType
+          maritalStatus
+          mobile
+          motherGuardian
+          religion
+          studentId
+          trainingProgram
+        }
+      }
+    }
+  }
+`;
+
+export const ASSIGN_BATCH_TOSTUDENT = gql`
+  mutation AssignStudentToBatch(
+    $batchId: ID!
+    $studentId: ID!
+    $token: String!
+  ) {
+    assignStudentToBatch(
+      batchId: $batchId
+      studentId: $studentId
+      token: $token
+    ) {
+      batchName
+    }
+  }
+`;
+
+export const GET_ALL_STUDENTS_BY_ADMIN_TOKEN = gql`
+  query GetAllStudentByAdminId($token: String!) {
+    getAllStudentByAdminId(token: $token) {
+      updatedAt
+      studentName
+      state
+      id
+      fingerprints {
+        id
+      }
+      details {
+        aadhar_number
+      }
+      createdAt
+      batchId
+      aadhar_number
+      batch {
+        user {
+          userName
+        }
+      }
     }
   }
 `;
