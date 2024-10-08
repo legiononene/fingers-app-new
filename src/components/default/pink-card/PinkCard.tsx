@@ -1,4 +1,4 @@
-import { Search, UserRoundPlus } from "lucide-react";
+import { Search, ShieldPlus, UserRoundPlus, UsersRound } from "lucide-react";
 
 type Props = {
   title: string | undefined;
@@ -7,6 +7,7 @@ type Props = {
   searchTerm: string;
   setSearchTerm: (searchTerm: string) => void;
   handleAddButton?: () => void;
+  handleAddMultipleButton?: () => void;
 };
 
 const PinkCard = ({
@@ -16,18 +17,31 @@ const PinkCard = ({
   searchTerm,
   setSearchTerm,
   handleAddButton,
+  handleAddMultipleButton,
 }: Props) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
+  //console.log("data->", data);
+
   const isStudentArray = (arr: any[]): arr is Student[] =>
     arr.length > 0 && "aadhar_number" in arr[0];
-  //console.log("data->", data);
+
+  const isBatchArray = (arr: any[]): arr is Batch[] =>
+    arr.length > 0 && "batchName" in arr[0];
+
   const placeHolder =
     Array.isArray(data) && isStudentArray(data)
       ? "Search by Name or Aadhar..."
       : "Search by Name...";
+
+  const AddButtonIcon =
+    Array.isArray(data) && isBatchArray(data) ? (
+      <ShieldPlus />
+    ) : (
+      <UserRoundPlus />
+    );
 
   return (
     <div className="pink-card">
@@ -47,11 +61,18 @@ const PinkCard = ({
           <Search className="search-icon" />
         </div>
       </div>
-      {handleAddButton && (
-        <button id="add-button" onClick={handleAddButton}>
-          <UserRoundPlus />
-        </button>
-      )}
+      <div className="buttons">
+        {handleAddButton && (
+          <button id="add-button" onClick={handleAddButton}>
+            {AddButtonIcon}
+          </button>
+        )}
+        {handleAddMultipleButton && (
+          <button id="add-button" onClick={handleAddMultipleButton}>
+            <UsersRound />
+          </button>
+        )}
+      </div>
     </div>
   );
 };

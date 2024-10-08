@@ -1,5 +1,7 @@
+import UserDashboard from "@/components/admin/user/UserDashboard";
+
 const page = () => {
-  return <>User Admin</>;
+  return <UserDashboard />;
 };
 
 export default page;

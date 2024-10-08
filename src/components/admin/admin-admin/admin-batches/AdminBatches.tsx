@@ -46,7 +46,8 @@ type UsersData = {
 const AdminBatches = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [state, setState] = useState<string | null>(null);
+  const [state, setState] = useState<string[]>([]);
+
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignUserId, setAsignUserId] = useState<string | null>(null);
 
@@ -134,6 +135,8 @@ const AdminBatches = () => {
     }
   );
 
+  const batchdataProp = batchData?.getAllBatchesByAdminId;
+
   useEffect(() => {
     refetch();
   }, []);
@@ -145,8 +148,6 @@ const AdminBatches = () => {
   if (batchError) {
     return <ErrorApollo error={batchError} />;
   }
-
-  const batchdataProp = batchData?.getAllBatchesByAdminId;
 
   return (
     <section id="adminBatches">
@@ -191,7 +192,7 @@ const AdminBatches = () => {
                 batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
               )
               .sort((a, b) => a.batchName.localeCompare(b.batchName))
-              .map((batch: Batch) => (
+              .map((batch: Batch, i) => (
                 <div className="card" key={batch.id}>
                   <div className="batch-info">
                     <p className="highlight-yellow">
@@ -250,10 +251,15 @@ const AdminBatches = () => {
                   </div>
                   <div className="settings">
                     <select
-                      value={state !== null ? state : batch.state.toString()}
+                      value={
+                        state?.length !== 0 ? state[i] : batch.state.toString()
+                      }
                       onChange={(e) => {
                         const newState = e.target.value === "true";
-                        setState(newState.toString());
+                        setState((priv) => {
+                          priv[i] = String(newState);
+                          return priv;
+                        });
                         changeStateOfBatchByBatchIdByAdmin({
                           variables: {
                             token,

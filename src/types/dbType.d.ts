@@ -3,6 +3,8 @@ type FingerPrint = {
   id: string; // (uuid)
   image: string;
   priority: number;
+  name: string; // "FD-1" ,"FD-2",
+  scale: number;
 };
 
 type Details = {
@@ -40,6 +42,7 @@ type Student = {
   fingerprints: FingerPrint[];
   Details?: Details | null;
   batchId: string;
+  batch: Batch;
 };
 
 type Batch = {

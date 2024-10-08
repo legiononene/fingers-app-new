@@ -5,7 +5,9 @@
 #adminUser,
 #adminBatch,
 #adminBatches,
-#adminStudents {
+#adminStudents,
+#userBatches,
+#userBatch {
   @include padding-block;
 
   .fg {

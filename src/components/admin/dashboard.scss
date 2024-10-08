@@ -1,7 +1,8 @@
 @use "@/app/scss/variables" as *;
 
 #superAdminDashboard,
-#adminDashboard {
+#adminDashboard,
+#userDashboard {
   @include padding-block;
 
   .fg {

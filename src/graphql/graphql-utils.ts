@@ -270,7 +270,7 @@ export const GET_BATCH_BY_BATCH_ID = gql`
   }
 `;
 
-export const ASSIGN_BATCH_TOSTUDENT = gql`
+export const ASSIGN_BATCH_TO_STUDENT = gql`
   mutation AssignStudentToBatch(
     $batchId: ID!
     $studentId: ID!
@@ -307,6 +307,198 @@ export const GET_ALL_STUDENTS_BY_ADMIN_TOKEN = gql`
           userName
         }
       }
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query GetUserByUserToken($token: String!) {
+    getUserByUserToken(token: $token) {
+      role
+      userName
+      updatedAt
+      createdAt
+      id
+      adminId
+      batches {
+        batchName
+        createdAt
+        id
+        inTime
+        outTime
+        state
+        students {
+          studentName
+        }
+        updatedAt
+      }
+    }
+  }
+`;
+
+export const GET_BATCHES_BY_USER_TOKEN = gql`
+  query Root_Query($token: String!, $userId: ID!) {
+    getAllBatchesByUserIdByUserToken(token: $token, userId: $userId) {
+      batchName
+      createdAt
+      id
+      inTime
+      outTime
+      state
+      students {
+        studentName
+      }
+      updatedAt
+      userId
+      user {
+        userName
+      }
+    }
+  }
+`;
+
+export const CHANGE_STATE_OF_BATCH_BY_USER = gql`
+  mutation Root_Mutation($token: String!, $state: Boolean!, $batchId: ID!) {
+    changeStateOfBatchByBatchIdByUser(
+      token: $token
+      state: $state
+      batchId: $batchId
+    ) {
+      batchName
+    }
+  }
+`;
+
+export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
+  query Root_Query($token: String!, $batchId: ID!) {
+    getBatchByBatchIdByUserToken(token: $token, id: $batchId) {
+      batchName
+      createdAt
+      id
+      inTime
+      outTime
+      state
+      userId
+      updatedAt
+      students {
+        studentName
+        aadhar_number
+        batchId
+        createdAt
+        updatedAt
+        state
+        id
+        fingerprints {
+          id
+          image
+          priority
+          studentId
+        }
+        details {
+          aadhar_number
+          address
+          castCategory
+          disability
+          disabilityType
+          dob
+          domicileDistrict
+          domicileState
+          email
+          employed
+          employmentDetails
+          employmentStatus
+          fatherGuardian
+          gender
+          id
+          idType
+          maritalStatus
+          mobile
+          motherGuardian
+          religion
+          studentId
+          trainingProgram
+        }
+      }
+    }
+  }
+`;
+
+export const ASSIGN_BATCH_TO_STUDENT_BY_USER_TOKEN = gql`
+  mutation Root_Mutation($token: String!, $studentId: ID!, $batchId: ID!) {
+    assignBatchToStudentByUserToken(
+      token: $token
+      studentId: $studentId
+      batchId: $batchId
+    ) {
+      batchName
+    }
+  }
+`;
+
+export const ADD_BATCH_BY_USER_TOKEN = gql`
+  mutation AddBatchesByUserToken(
+    $token: String!
+    $inTime: String!
+    $outTime: String!
+    $batchName: String!
+  ) {
+    AddBatchesByUserToken(
+      token: $token
+      inTime: $inTime
+      outTime: $outTime
+      batchName: $batchName
+    ) {
+      batchName
+    }
+  }
+`;
+
+export const UPDATE_BATCH_BY_USER_TOKEN = gql`
+  mutation UpdateBatchByBatchIdByUserToken(
+    $token: String!
+    $updateId: ID!
+    $batchName: String
+    $inTime: String
+    $outTime: String
+  ) {
+    updateBatchByBatchIdByUserToken(
+      token: $token
+      id: $updateId
+      batchName: $batchName
+      inTime: $inTime
+      outTime: $outTime
+    ) {
+      batchName
+    }
+  }
+`;
+
+export const DELETE_BATCH_BY_USER_TOKEN = gql`
+  mutation DeleteBatchByBatchIdByUserToken($token: String!, $deleteId: ID!) {
+    deleteBatchByBatchIdByUserToken(token: $token, id: $deleteId) {
+      batchName
+    }
+  }
+`;
+
+export const ADD_STUDENTS_TO_BATCH_BY_USER_TOKEN = gql`
+  mutation AddStudentsByUserToken(
+    $token: String!
+    $batchId: String!
+    $aadharNumber: Int!
+    $studentName: String
+    $state: [String!]
+    $details: DetailsInput
+  ) {
+    AddStudentsByUserToken(
+      token: $token
+      BatchId: $batchId
+      aadhar_number: $aadharNumber
+      studentName: $studentName
+      state: $state
+      details: $details
+    ) {
+      studentName
     }
   }
 `;

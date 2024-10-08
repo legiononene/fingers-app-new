@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/authContext";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@apollo/client";
 import {
-  ASSIGN_BATCH_TOSTUDENT,
+  ASSIGN_BATCH_TO_STUDENT,
   GET_ADMIN,
   GET_ALL_BATCHES_BY_ADMIN,
   GET_BATCH_BY_BATCH_ID,
@@ -89,7 +89,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
   const studentData = data?.getBatchByBatchId.students;
 
   const [assignStudentToBatch, { loading: assignLoading }] =
-    useMutation<BatchData>(ASSIGN_BATCH_TOSTUDENT, {
+    useMutation<BatchData>(ASSIGN_BATCH_TO_STUDENT, {
       onError: (error) => {
         console.log("error->", error);
         addToast(error.message || "Error asigning Student to Batch", "error");

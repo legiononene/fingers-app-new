@@ -126,6 +126,7 @@ select {
   font-size: rem(18);
   font-weight: 500;
   color: $c-text-highlight;
+  cursor: pointer;
 
   option {
     background-color: $lightBorder;
@@ -201,6 +202,11 @@ select {
         max-width: rem(250);
       }
     }
+  }
+
+  .buttons {
+    display: flex;
+    gap: rem(10);
   }
 }
 
@@ -330,6 +336,24 @@ form {
   padding: $p-l;
   display: grid;
   gap: rem(10);
+
+  .time-fields,
+  .column-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: rem(10);
+
+    textarea {
+      width: 100%;
+      background-color: $c-bg;
+      outline: none;
+      border: none;
+      color: $c-text;
+      border-radius: $b-radius;
+      padding: $p-l;
+      resize: none;
+    }
+  }
 
   .form-field {
     display: flex;

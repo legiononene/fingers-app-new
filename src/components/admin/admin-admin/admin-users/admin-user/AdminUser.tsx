@@ -52,7 +52,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignUserId, setAsignUserId] = useState<string | null>(slug);
-  const [state, setState] = useState<string | null>(null);
+  const [state, setState] = useState<string[]>([]);
 
   const router = useRouter();
   const { addToast } = useToast();
@@ -219,7 +219,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
               batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
             )
               .sort((a, b) => a.batchName.localeCompare(b.batchName))
-              .map((batch: Batch) => (
+              .map((batch: Batch, i) => (
                 <div className="card" key={batch.id}>
                   <div className="batch-info">
                     <p className="highlight-yellow">
@@ -272,10 +272,15 @@ const AdminUser = ({ slug }: { slug: string }) => {
                   </div>
                   <div className="settings">
                     <select
-                      value={state !== null ? state : batch.state.toString()}
+                      value={
+                        state?.length !== 0 ? state[i] : batch.state.toString()
+                      }
                       onChange={(e) => {
                         const newState = e.target.value === "true";
-                        setState(newState.toString());
+                        setState((priv) => {
+                          priv[i] = String(newState);
+                          return priv;
+                        });
                         changeStateOfBatchByBatchIdByAdmin({
                           variables: {
                             token,
