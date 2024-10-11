@@ -114,6 +114,16 @@ a {
   font-size: rem(14);
 }
 
+.text-xs {
+  font-size: rem(12);
+}
+
+.text-xxs {
+  font-size: rem(10);
+  line-height: rem(10);
+  color: $c-yellow;
+}
+
 select {
   background: none;
   outline: none;
@@ -167,6 +177,8 @@ select {
   background-color: $c-link;
   padding: $p-l;
   border-radius: $b-radius;
+  justify-content: space-between;
+  gap: rem(10);
 
   .title {
     width: 100%;
@@ -205,8 +217,14 @@ select {
   }
 
   .buttons {
+    width: min-content;
     display: flex;
     gap: rem(10);
+    flex-wrap: wrap;
+
+    @include breakpoint(medium) {
+      flex-wrap: nowrap;
+    }
   }
 }
 
@@ -264,6 +282,66 @@ select {
 
   @include breakpoint(large) {
     padding-inline: 32vw;
+  }
+
+  .existing-fingers {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+    width: 100%;
+    overflow-x: scroll;
+
+    .images-container {
+      width: 100%;
+      display: flex;
+      gap: rem(10);
+      padding-bottom: rem(16);
+
+      .img-container {
+        width: rem(50);
+        display: flex;
+        flex-direction: column;
+        gap: rem(5);
+
+        img {
+          width: rem(50);
+        }
+
+        button {
+          padding: $p-s;
+          width: 100%;
+          background-color: $c-fg;
+
+          &:hover {
+            background-color: $c-bg;
+          }
+        }
+      }
+    }
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(medium) {
+      flex-direction: row;
+    }
+  }
+
+  .add,
+  .clear {
+    font-size: rem(14);
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: $c-red-light;
+    }
+  }
+
+  .selected {
+    background-color: $c-dark-trans;
   }
 
   .card {
@@ -340,19 +418,34 @@ form {
   .time-fields,
   .column-fields {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: rem(10);
 
-    textarea {
-      width: 100%;
-      background-color: $c-bg;
-      outline: none;
-      border: none;
-      color: $c-text;
-      border-radius: $b-radius;
-      padding: $p-l;
-      resize: none;
+    @include breakpoint(medium) {
+      grid-template-columns: 1fr 1fr;
     }
+  }
+
+  textarea {
+    width: 100%;
+    background-color: $c-bg;
+    outline: none;
+    border: none;
+    color: $c-text;
+    border-radius: $b-radius;
+    padding: $p-l;
+    resize: none;
+    font-family: inherit;
+  }
+
+  .addMoreDetailsBtn {
+    font-size: rem(14);
+  }
+
+  .details-column {
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
   }
 
   .form-field {
@@ -371,6 +464,43 @@ form {
 
     &:hover {
       background-color: $c-dark-trans;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      background-color: $c-red-light;
+    }
+  }
+}
+#AddDetails {
+  @include breakpoint(large) {
+    padding-inline: 22vw;
+  }
+}
+.deatils_form {
+  .scrollable_area {
+    max-height: 50vh;
+    overflow-y: scroll;
+    border-radius: $b-radius;
+    display: flex;
+    flex-direction: column;
+    gap: rem(10);
+
+    @include breakpoint(medium) {
+      max-height: 60vh;
+    }
+  }
+
+  .form-field {
+    gap: rem(5);
+
+    label {
+      font-size: rem(16);
+    }
+    input,
+    textarea {
+      font-size: rem(16);
+      padding: rem(15) rem(20);
     }
   }
 }
@@ -504,8 +634,4 @@ form {
     color: $c-red;
     font-size: rem(28);
   }
-}
-
-.text-xs {
-  font-size: rem(12);
 }

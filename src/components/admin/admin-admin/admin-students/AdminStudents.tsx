@@ -142,7 +142,11 @@ const AdminStudents = () => {
         />
         <div className="cards">
           <div className="links">
-            <Link href="/admin-dashboard/" className="link-back ">
+            <Link
+              title="Back to Dashboard"
+              href="/admin-dashboard/"
+              className="link-back "
+            >
               <ArrowLeft size={14} /> Dashboard
             </Link>
           </div>
@@ -215,6 +219,7 @@ const AdminStudents = () => {
                   </div>
                   <div className="settings">
                     <button
+                      title="Assign Student to another Batch"
                       onClick={() => {
                         if (asign?.id === student.id) {
                           setAsign(null);
@@ -227,7 +232,7 @@ const AdminStudents = () => {
                       <Repeat />
                     </button>
                     {student.Details && (
-                      <button>
+                      <button title="View or Change Student Detalis">
                         <Eye />
                       </button>
                     )}
@@ -239,6 +244,7 @@ const AdminStudents = () => {
                       </p>
                       <div className="buttons">
                         <select
+                          title="Change Batch of Student"
                           className="asign-select"
                           disabled={batchDataProp?.length === 0}
                           value={asignBatchId || ""}
@@ -253,6 +259,7 @@ const AdminStudents = () => {
                             ))}
                         </select>
                         <button
+                          title="Confirm Assign Student to another Batch"
                           disabled={
                             !asignBatchId ||
                             assignLoading ||
@@ -280,7 +287,12 @@ const AdminStudents = () => {
                             </>
                           )}
                         </button>
-                        <button onClick={() => setAsign(null)}>Cancel</button>
+                        <button
+                          title="Cancle Assign Student to Batch"
+                          onClick={() => setAsign(null)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}

@@ -125,7 +125,11 @@ const Admindashboard = () => {
           }
         />
         <div className="right">
-          <Link href="/admin-dashboard/users" className="card">
+          <Link
+            title="View All Users"
+            href="/admin-dashboard/users"
+            className="card"
+          >
             <h5 className="highlight">
               <UserRound size={16} strokeWidth={3} />
               Users
@@ -139,7 +143,11 @@ const Admindashboard = () => {
                 : userData?.getAllUsersByAdminToken.length}
             </p>
           </Link>
-          <Link href="/admin-dashboard/batches" className="card">
+          <Link
+            title="View All Batches"
+            href="/admin-dashboard/batches"
+            className="card"
+          >
             <h5 className="highlight">
               <Shield size={16} strokeWidth={3} />
               Batches
@@ -153,7 +161,11 @@ const Admindashboard = () => {
                 : batchData?.getAllBatchesByAdminId.length}
             </p>
           </Link>
-          <Link href="/admin-dashboard/students" className="card">
+          <Link
+            title="View All Students"
+            href="/admin-dashboard/students"
+            className="card"
+          >
             <h5 className="highlight">
               <GraduationCap size={16} strokeWidth={3} />
               Students

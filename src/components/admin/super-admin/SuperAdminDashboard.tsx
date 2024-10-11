@@ -49,7 +49,11 @@ const SuperAdminDashboard = () => {
               : "User"
           }
         />
-        <Link href="/superAdmin-dashboard/admin" className="card">
+        <Link
+          title="View All Admins"
+          href="/superAdmin-dashboard/admin"
+          className="card"
+        >
           <h5 className="highlight">
             <UserRound size={16} strokeWidth={3} />
             Admins

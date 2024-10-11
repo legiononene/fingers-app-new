@@ -47,7 +47,10 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
           {toasts.map((toast) => (
             <div key={toast.id} className={`toast toast-${toast.type}`}>
               <p>{toast.message}</p>
-              <button onClick={() => removeToast(toast.id)}>
+              <button
+                title="Close Toast Notification"
+                onClick={() => removeToast(toast.id)}
+              >
                 <X />
               </button>
             </div>

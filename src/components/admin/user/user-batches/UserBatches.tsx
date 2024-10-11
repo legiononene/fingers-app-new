@@ -209,6 +209,7 @@ const UserBatches = () => {
     setBatchOutTime("");
     setUpdateId(id);
     setFunctionType("update");
+    setConfirmDelete(null);
   };
 
   if (batchesLoading) {
@@ -241,7 +242,11 @@ const UserBatches = () => {
           />
           <div className="cards">
             <div className="links">
-              <Link href="/user-dashboard/" className="link-back">
+              <Link
+                title="Back to Dashboard"
+                href="/user-dashboard/"
+                className="link-back"
+              >
                 <ArrowLeft size={14} /> Dashboard
               </Link>
             </div>
@@ -320,6 +325,7 @@ const UserBatches = () => {
                     </div>
                     <div className="settings">
                       <button
+                        title="Delete this Batch"
                         id="delete-button"
                         onClick={() => {
                           if (confirmDelete?.id === batch.id) {
@@ -333,6 +339,7 @@ const UserBatches = () => {
                         {deleteLoading ? "Deleting..." : <Trash />}
                       </button>
                       <select
+                        title="Change State of this Batch"
                         value={
                           state?.length !== 0
                             ? state[i]
@@ -357,6 +364,7 @@ const UserBatches = () => {
                         <option value="false">Inactive</option>
                       </select>
                       <button
+                        title="Update this Batch"
                         id="settings-button"
                         onClick={() => {
                           handleUpdateButton(batch.batchName, batch.id);
@@ -365,6 +373,7 @@ const UserBatches = () => {
                         <Settings />
                       </button>
                       <button
+                        title="View this Batch"
                         onClick={() =>
                           router.push(`/user-dashboard/batches/${batch.id}`)
                         }
@@ -379,6 +388,7 @@ const UserBatches = () => {
                         </p>
                         <div className="buttons">
                           <button
+                            title="Confirm Delete this Batch"
                             className="delete"
                             onClick={() => {
                               deleteBatchByUserToken({
@@ -392,7 +402,10 @@ const UserBatches = () => {
                           >
                             {deleteLoading ? "Deleting..." : "Confirm"}
                           </button>
-                          <button onClick={() => setConfirmDelete(null)}>
+                          <button
+                            title="Cancle Delete this Batch"
+                            onClick={() => setConfirmDelete(null)}
+                          >
                             Cancel
                           </button>
                         </div>

@@ -62,7 +62,7 @@ const Auth = () => {
       setUsername("");
       setPassword("");
       setErrorMessage("");
-      setLoginToken(data.loginUser.token);
+      setLoginToken(data.loginUser.token, data.loginUser.role);
 
       if (data.loginUser.role === "superAdmin") {
         localStorage.setItem("role", "superAdmin");
@@ -117,6 +117,7 @@ const Auth = () => {
                 required
               />
               <button
+                title={openPassword ? "Hide password" : "Show Password"}
                 type="button"
                 onClick={() => setOpenPassword(!openPassword)}
               >
@@ -129,7 +130,7 @@ const Auth = () => {
             {error && !errorMessage && (
               <p className="error-text text-s">Error: {error.message}</p>
             )}
-            <button type="submit">
+            <button title="Login" type="submit">
               {loading ? <RefreshCw size={24} className="loader" /> : "Login"}
             </button>
           </form>

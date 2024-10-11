@@ -84,7 +84,11 @@ const UserDashboard = () => {
         />
 
         <div className="right">
-          <Link href="/user-dashboard/batches" className="card">
+          <Link
+            title="View All Batches"
+            href="/user-dashboard/batches"
+            className="card"
+          >
             <h5 className="highlight">
               <Shield size={16} strokeWidth={3} />
               Batches
@@ -98,7 +102,11 @@ const UserDashboard = () => {
                 : batchDataProp?.length}
             </p>
           </Link>
-          <Link href="/user-dashboard/students" className="card">
+          <Link
+            title="View All Students"
+            href="/user-dashboard/students"
+            className="card"
+          >
             <h5 className="highlight">
               <GraduationCap size={16} strokeWidth={3} />
               Students

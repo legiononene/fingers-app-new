@@ -135,6 +135,7 @@ const App = () => {
           <p className="text-s">Settings:</p>
           <div className="priority">
             <button
+              title={`${priority ? "Lock Priority" : "UnLock Priority"}`}
               onClick={togglePrority}
               className={priority ? "active" : ""}
             >
@@ -152,6 +153,7 @@ const App = () => {
             </button>
             <div className="set-priority">
               <button
+                title="Set Priority"
                 disabled={!priority}
                 className={priority ? "active" : ""}
                 onClick={() => runForOneSecond("priority")}
@@ -166,6 +168,7 @@ const App = () => {
           </div>
           <div className="scale">
             <button
+              title={`${lockedScale ? "UnLock Scale" : "Lock Scale"}`}
               onClick={handleLockScale}
               className={lockedScale !== null ? "" : "active"}
             >
@@ -182,6 +185,7 @@ const App = () => {
               )}
             </button>
             <button
+              title="Set Scale"
               disabled={lockedScale !== null}
               onClick={() => runForOneSecond("scale")}
             >
@@ -195,8 +199,12 @@ const App = () => {
         </div>
         {appDB[0]?.images && (
           <div className="change">
-            <button onClick={handlePrev}>Previous</button>
-            <button onClick={handleNext}>Next</button>
+            <button title="Previous Fingerprint" onClick={handlePrev}>
+              Previous
+            </button>
+            <button title="Nest Fingerprint" onClick={handleNext}>
+              Next
+            </button>
           </div>
         )}
       </div>

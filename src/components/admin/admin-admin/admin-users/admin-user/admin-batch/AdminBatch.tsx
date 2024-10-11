@@ -50,7 +50,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
   const { addToast } = useToast();
   const pathname = usePathname();
 
-  console.log("pathname->", pathname);
+  //console.log("pathname->", pathname);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -117,7 +117,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
 
   const batchDataProp = batchData?.getAllBatchesByAdminId;
 
-  console.log("asignBatchId->", asignBatchId);
+  //console.log("asignBatchId->", asignBatchId);
 
   if (loading) {
     return <NetworkStatusApollo />;
@@ -154,13 +154,22 @@ const AdminBatch = ({ slug }: { slug: string }) => {
           <div className="links">
             {pathname.includes("/admin-dashboard/users") ? (
               <>
-                <Link href="/admin-dashboard/" className="link-back ">
+                <Link
+                  title="back to Dashboard"
+                  href="/admin-dashboard/"
+                  className="link-back "
+                >
                   <ArrowLeft size={14} /> Dashboard
                 </Link>
-                <Link href={`/admin-dashboard/users/`} className="link-back ">
+                <Link
+                  title="Back to All Users"
+                  href={`/admin-dashboard/users/`}
+                  className="link-back "
+                >
                   <ArrowLeft size={14} /> All Users
                 </Link>
                 <Link
+                  title={`Back to ${data?.getBatchByBatchId.user.userName} User`}
                   href={`/admin-dashboard/users/${data?.getBatchByBatchId.userId}`}
                   className="link-back "
                 >
@@ -169,10 +178,18 @@ const AdminBatch = ({ slug }: { slug: string }) => {
               </>
             ) : pathname.includes("/admin-dashboard/batches/") ? (
               <>
-                <Link href="/admin-dashboard/" className="link-back ">
+                <Link
+                  title="back To Dashboard"
+                  href="/admin-dashboard/"
+                  className="link-back "
+                >
                   <ArrowLeft size={14} /> Dashboard
                 </Link>
-                <Link href="/admin-dashboard/batches/" className="link-back ">
+                <Link
+                  title="Back to All Batches"
+                  href="/admin-dashboard/batches/"
+                  className="link-back "
+                >
                   <ArrowLeft size={14} /> All Batches
                 </Link>
               </>
@@ -244,8 +261,8 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                       <p className="text-s">
                         Full Aadhar:{" "}
                         <span className="highlight text-xs">
-                          {student.Details
-                            ? student.Details?.aadhar_number
+                          {student.details
+                            ? student.details?.aadhar_number
                             : student.aadhar_number}
                         </span>
                       </p>
@@ -253,6 +270,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                   </div>
                   <div className="settings">
                     <button
+                      title="Assign Student to another Batch"
                       onClick={() => {
                         if (asign?.id === student.id) {
                           setAsign(null);
@@ -264,8 +282,8 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                     >
                       <Repeat />
                     </button>
-                    {student.Details && (
-                      <button>
+                    {student.details && (
+                      <button title="View or Update Student Details">
                         <Eye />
                       </button>
                     )}
@@ -277,6 +295,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                       </p>
                       <div className="buttons">
                         <select
+                          title="Change Batch of the Student"
                           className="asign-select"
                           disabled={batchDataProp?.length === 0}
                           value={asignBatchId || ""}
@@ -291,6 +310,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                             ))}
                         </select>
                         <button
+                          title="Confirm Assign Student to another Batch"
                           disabled={
                             !asignBatchId ||
                             assignLoading ||
@@ -318,7 +338,12 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                             </>
                           )}
                         </button>
-                        <button onClick={() => setAsign(null)}>Cancel</button>
+                        <button
+                          title="Cancle Assign Student to Batch"
+                          onClick={() => setAsign(null)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}

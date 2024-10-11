@@ -84,7 +84,7 @@ const AddUpdateBatchStudentPopup = ({
       <div className="card" onClick={(e) => e.stopPropagation()}>
         <div className="title">
           <h4>{title}</h4>
-          <button onClick={() => setFunctionType("")}>
+          <button title={`Close ${title}`} onClick={() => setFunctionType("")}>
             <X />
           </button>
         </div>
@@ -124,7 +124,7 @@ const AddUpdateBatchStudentPopup = ({
           {error && !errorMessage && (
             <p className="error-text text-s">Error: {error.message}</p>
           )}
-          <button type="submit">
+          <button title={title} type="submit">
             {loading ? <RefreshCw size={24} className="loader" /> : `${title}`}
           </button>
         </form>

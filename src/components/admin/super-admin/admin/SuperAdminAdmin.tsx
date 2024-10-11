@@ -204,6 +204,7 @@ const SuperAdminAdmin = () => {
                       </div>
                       <div className="settings">
                         <button
+                          title="Delete Admin"
                           id="delete-button"
                           onClick={() => {
                             if (confirmDelete?.id === admin.id) {
@@ -217,6 +218,7 @@ const SuperAdminAdmin = () => {
                           {deleteLoading ? "Deleting..." : <Trash />}
                         </button>
                         <button
+                          title="Update Admin"
                           id="settings-button"
                           onClick={() => {
                             handleUpdateButton(admin.userName, admin.id);
@@ -232,6 +234,8 @@ const SuperAdminAdmin = () => {
                           </p>
                           <div className="buttons">
                             <button
+                              title="Confirm Delete Admin"
+                              className="delete"
                               onClick={() => {
                                 deleteAdmin({
                                   variables: {
@@ -244,7 +248,10 @@ const SuperAdminAdmin = () => {
                             >
                               {deleteLoading ? "Deleting..." : "Confirm"}
                             </button>
-                            <button onClick={() => setConfirmDelete(null)}>
+                            <button
+                              title="Cancle Delete Admin"
+                              onClick={() => setConfirmDelete(null)}
+                            >
                               Cancel
                             </button>
                           </div>

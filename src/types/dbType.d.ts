@@ -1,23 +1,23 @@
 type FingerPrint = {
-  student_id: string;
-  id: string; // (uuid)
+  student_id?: string;
+  id?: string; // (uuid)
   image: string;
-  priority: number;
-  name: string; // "FD-1" ,"FD-2",
-  scale: number;
+  priority?: number;
+  name?: string; // "FD-1" ,"FD-2",
+  scale?: number;
 };
 
 type Details = {
-  student_id: string;
-  id: string; // (uuid)
-  aadhar_number: number; // full aadhar number
-  mubile: number;
+  student_id?: string;
+  id?: string; // (uuid)
+  aadhar_number: string; // full aadhar number
+  mobile: string;
   email: string;
   address: string;
   domicileState: string;
-  domicileDistric: string;
+  domicileDistrict: string;
   idType: string;
-  dob: Date;
+  dob: string;
   gender: string;
   maritalStatus: string;
   fatherGuardian: string;
@@ -30,6 +30,8 @@ type Details = {
   employmentStatus?: string;
   employmentDetails?: string;
   trainingProgram: string;
+  pincode?: number;
+  educationLevel?: string;
 };
 
 type Student = {
@@ -37,10 +39,10 @@ type Student = {
   createdAt: string;
   updatedAt: string;
   studentName: string;
-  aadhar_number: number; // last 8 digits
+  aadhar_number: string; // last 8 digits
   state: string[]; // If IN then ["IN"] | if IN and OUT then ["IN", "OUT"] | if ABSENT then [""]
   fingerprints: FingerPrint[];
-  Details?: Details | null;
+  details?: Details | null;
   batchId: string;
   batch: Batch;
 };

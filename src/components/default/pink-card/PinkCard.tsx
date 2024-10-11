@@ -63,12 +63,22 @@ const PinkCard = ({
       </div>
       <div className="buttons">
         {handleAddButton && (
-          <button id="add-button" onClick={handleAddButton}>
+          <button
+            title={`Add ${
+              Array.isArray(data) && isStudentArray(data) ? "Student" : title
+            }`}
+            id="add-button"
+            onClick={handleAddButton}
+          >
             {AddButtonIcon}
           </button>
         )}
         {handleAddMultipleButton && (
-          <button id="add-button" onClick={handleAddMultipleButton}>
+          <button
+            title="Add Multiple Students"
+            id="add-button"
+            onClick={handleAddMultipleButton}
+          >
             <UsersRound />
           </button>
         )}

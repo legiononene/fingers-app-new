@@ -189,7 +189,11 @@ const AdminUsers = () => {
           />
           <div className="cards">
             <div className="links">
-              <Link href="/admin-dashboard/" className="link-back">
+              <Link
+                title="Back to Dashboard"
+                href="/admin-dashboard/"
+                className="link-back"
+              >
                 <ArrowLeft size={14} /> Dashboard
               </Link>
             </div>
@@ -257,6 +261,7 @@ const AdminUsers = () => {
                       </div>
                       <div className="settings">
                         <button
+                          title="Delete User"
                           id="delete-button"
                           onClick={() => {
                             if (confirmDelete?.id === user.id) {
@@ -270,6 +275,7 @@ const AdminUsers = () => {
                           {deleteLoading ? "Deleting..." : <Trash />}
                         </button>
                         <button
+                          title="Update User"
                           id="settings-button"
                           onClick={() => {
                             handleUpdateButton(user.userName, user.id);
@@ -278,6 +284,7 @@ const AdminUsers = () => {
                           <Settings />
                         </button>
                         <button
+                          title="View User"
                           onClick={() =>
                             router.push(`/admin-dashboard/users/${user.id}`)
                           }
@@ -293,6 +300,7 @@ const AdminUsers = () => {
                           </p>
                           <div className="buttons">
                             <button
+                              title="Confirm Delete User"
                               className="delete"
                               onClick={() => {
                                 deleteUserByAdmintoken({
@@ -306,7 +314,10 @@ const AdminUsers = () => {
                             >
                               {deleteLoading ? "Deleting..." : "Confirm"}
                             </button>
-                            <button onClick={() => setConfirmDelete(null)}>
+                            <button
+                              title="Cancle Delete User"
+                              onClick={() => setConfirmDelete(null)}
+                            >
                               Cancel
                             </button>
                           </div>

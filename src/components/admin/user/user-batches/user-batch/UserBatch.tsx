@@ -9,9 +9,12 @@ import {
   ArrowLeft,
   Eye,
   Fingerprint,
+  ReceiptText,
   RefreshCw,
   Repeat,
+  Settings,
   Shield,
+  Trash,
 } from "lucide-react";
 import Link from "next/link";
 import PinkCard from "@/components/default/pink-card/PinkCard";
@@ -21,14 +24,22 @@ import {
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
 import {
-  ADD_STUDENTS_TO_BATCH_BY_USER_TOKEN,
+  ADD_DETAILS_TO_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
+  ADD_FINGERPRINTS_TO_STUDENT_BY_USER_TOKEN,
+  ADD_MULTIPLE_STUDENTS_TO_BATCH_BY_USER_TOKEN,
+  ADD_STUDENT_TO_BATCH_BY_USER_TOKEN,
   ASSIGN_BATCH_TO_STUDENT_BY_USER_TOKEN,
+  DELETE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
   GET_BATCH_BY_BATCH_ID_BY_USER,
   GET_BATCHES_BY_USER_TOKEN,
   GET_USER,
+  UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
+  UPDATE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
 } from "@/graphql/graphql-utils";
 import { useToast } from "@/contexts/toastContext";
 import AddUpdateStudentsPopup from "../../addStudents/AddUpdateStudentsPopup";
+import AddFingers from "../../addFingers/AddFingers";
+import AddDetails from "../../addDetails/AddDetails";
 
 type Props = {
   slug: string;
@@ -56,10 +67,44 @@ const UserBatch = ({ slug }: Props) => {
   >("");
   const [updateId, setUpdateId] = useState<string>("");
   const [studentName, setStudentName] = useState<string>("");
-  const [aadharNumber, setAadharNumber] = useState<number>(0);
-  const [details, setDetails] = useState<boolean>(false);
+  const [aadharNumber, setAadharNumber] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string } | null>(
+    null
+  );
+  const [fingerPrintOpen, setFingerPrintOpen] = useState<{ id: string } | null>(
+    null
+  );
+  const [studentId, setStudentId] = useState<string>("");
+  const [detailsFunctionType, setDetailsFunctionType] = useState<
+    "add" | "update" | ""
+  >("");
 
-  console.log("functionType->", functionType);
+  const [detailsId, setDetailsId] = useState<string>();
+  const [studentDetails, setStudentDetails] = useState<Details>({
+    aadhar_number: "",
+    mobile: "",
+    email: "",
+    address: "",
+    domicileState: "",
+    domicileDistrict: "",
+    idType: "",
+    dob: "",
+    gender: "",
+    maritalStatus: "",
+    fatherGuardian: "",
+    motherGuardian: "",
+    religion: "",
+    castCategory: "",
+    disability: false,
+    disabilityType: undefined,
+    employed: false,
+    employmentStatus: undefined,
+    employmentDetails: undefined,
+    trainingProgram: "",
+  });
+
+  const [statusMessage, setStatusMessage] = useState<string>("");
 
   const { token } = useAuth();
   const { addToast } = useToast();
@@ -95,6 +140,8 @@ const UserBatch = ({ slug }: Props) => {
     },
   });
 
+  //console.log("batchData->", batchData);
+
   useEffect(() => {
     refetchUser();
     batchStudents();
@@ -118,8 +165,6 @@ const UserBatch = ({ slug }: Props) => {
 
   const batchesDataProp =
     batchesData && batchesData.getAllBatchesByUserIdByUserToken;
-
-  //console.log("batchData->", batchData);
 
   const [assignBatchToStudentByUserToken, { loading: assignLoading }] =
     useMutation<BatchData>(ASSIGN_BATCH_TO_STUDENT_BY_USER_TOKEN, {
@@ -145,15 +190,18 @@ const UserBatch = ({ slug }: Props) => {
     });
 
   const [
-    addStudentsByUser,
-    { loading: addStudentsLoading, error: addStudentserror },
-  ] = useMutation<Student>(ADD_STUDENTS_TO_BATCH_BY_USER_TOKEN, {
+    addStudentByUser,
+    { loading: addStudentLoading, error: addStudentError },
+  ] = useMutation<Student>(ADD_STUDENT_TO_BATCH_BY_USER_TOKEN, {
     onError: (error) => {
       console.log("error->", error.message);
+
       if (error.message.includes("Aadhar No. already exists")) {
-        addToast("Aadhar No. already exists", "info");
+        addToast(`${error.message}`, "info");
+        setErrorMessage(`${error.message}`);
       } else {
         addToast(error.message, "error");
+        setErrorMessage(`${error.message}`);
       }
       return;
     },
@@ -170,19 +218,270 @@ const UserBatch = ({ slug }: Props) => {
     ],
     onCompleted: () => {
       addToast("Student added to Batch successfully", "success");
+      setStudentName("");
+      setAadharNumber("");
+      setFunctionType("");
+      setConfirmDelete(null);
+    },
+  });
+
+  const [
+    addMultipleStudentsByUser,
+    { loading: addMultipleStudentsLoading, error: addMultipleStudentsError },
+  ] = useMutation<Student>(ADD_MULTIPLE_STUDENTS_TO_BATCH_BY_USER_TOKEN, {
+    onError: (error) => {
+      console.log("error->", error.message);
+      if (error.message.includes("Aadhar No. already exists")) {
+        addToast(`${error.message}`, "info");
+        setErrorMessage(`${error.message}`);
+      } else {
+        addToast(error.message, "error");
+        setErrorMessage(`${error.message}`);
+      }
+      return;
+    },
+    refetchQueries: [
+      { query: GET_USER, variables: { token } },
+      {
+        query: GET_BATCH_BY_BATCH_ID_BY_USER,
+        variables: { batchId: slug, token },
+      },
+      {
+        query: GET_BATCHES_BY_USER_TOKEN,
+        variables: { token, userId: userDataProp?.id },
+      },
+    ],
+    onCompleted: () => {
+      addToast("Students added to Batch successfully", "success");
+      setStudentName("");
+      setAadharNumber("");
+      setFunctionType("");
+      setConfirmDelete(null);
+    },
+  });
+
+  const [
+    addFingerPrints,
+    { loading: addFingerPrintsLoading, error: addFingerPrintsError },
+  ] = useMutation<FingerPrint>(ADD_FINGERPRINTS_TO_STUDENT_BY_USER_TOKEN, {
+    onError: (error) => {
+      console.log("error->", error);
+      addToast(
+        error.message || "Error adding fingerprints to student",
+        "error"
+      );
+    },
+    refetchQueries: [
+      { query: GET_USER, variables: { token } },
+      {
+        query: GET_BATCH_BY_BATCH_ID_BY_USER,
+        variables: { batchId: slug, token },
+      },
+      {
+        query: GET_BATCHES_BY_USER_TOKEN,
+        variables: { token, userId: userDataProp?.id },
+      },
+    ],
+    onCompleted: () => {
+      addToast("Fingerprints Added to Student successfully", "success");
+      setConfirmDelete(null);
+    },
+  });
+
+  const [
+    updateStudentByUserToken,
+    {
+      data: updateStudentData,
+      loading: updateStudentLoading,
+      error: updateStudentError,
+    },
+  ] = useMutation<Student>(UPDATE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN, {
+    onError: (error) => {
+      console.error("error->", error.message);
+      if (error.message.includes("Aadhar No. already exists")) {
+        addToast(`${error.message}`, "info");
+        setErrorMessage(`${error.message}`);
+      } else {
+        addToast(error.message, "error");
+        setErrorMessage(`${error.message}`);
+      }
+      return;
+    },
+    refetchQueries: [
+      { query: GET_USER, variables: { token } },
+      {
+        query: GET_BATCH_BY_BATCH_ID_BY_USER,
+        variables: { batchId: slug, token },
+      },
+      {
+        query: GET_BATCHES_BY_USER_TOKEN,
+        variables: { token, userId: userDataProp?.id },
+      },
+    ],
+    onCompleted: () => {
+      addToast("Student Updated successfully", "success");
+      setStudentName(studentName);
+      setAadharNumber(aadharNumber);
+      setUpdateId(updateId);
+      setFunctionType("");
+      setConfirmDelete(null);
+    },
+  });
+
+  const [
+    deleteStudentByUserToken,
+    {
+      data: deleteStudentDate,
+      loading: deleteStudentLoading,
+      error: deleteStudentError,
+    },
+  ] = useMutation(DELETE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN, {
+    onError: (error) => {
+      console.error("error->", error.message);
+      addToast(error.message || "Error deleting Student", "error");
+    },
+    refetchQueries: [
+      { query: GET_USER, variables: { token } },
+      {
+        query: GET_BATCH_BY_BATCH_ID_BY_USER,
+        variables: { batchId: slug, token },
+      },
+      {
+        query: GET_BATCHES_BY_USER_TOKEN,
+        variables: { token, userId: userDataProp?.id },
+      },
+    ],
+    onCompleted: () => {
+      addToast("Student deleted successfully", "success");
+      setConfirmDelete(null);
+    },
+  });
+
+  const [addDetailsToStudent, { loading: addDetailsLoading }] = useMutation(
+    ADD_DETAILS_TO_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
+    {
+      onError: (error) => {
+        console.error("error->", error.message);
+        addToast(error.message || "Error adding details", "error");
+        setStatusMessage(error.message);
+      },
+      refetchQueries: [
+        { query: GET_USER, variables: { token } },
+        {
+          query: GET_BATCH_BY_BATCH_ID_BY_USER,
+          variables: { batchId: slug, token },
+        },
+        {
+          query: GET_BATCHES_BY_USER_TOKEN,
+          variables: { token, userId: userDataProp?.id },
+        },
+      ],
+      onCompleted: (data) => {
+        addToast("Details added successfully", "success");
+        console.log("data->", data);
+      },
+    }
+  );
+
+  const [
+    updateDetailsOfStudent,
+    { loading: updateDetailsLoading, error: updateDetailsError },
+  ] = useMutation(UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN, {
+    onError: (error) => {
+      console.error("error->", error.message);
+      addToast(error.message || "error updating Details", "error");
+    },
+    refetchQueries: [
+      { query: GET_USER, variables: { token } },
+      {
+        query: GET_BATCH_BY_BATCH_ID_BY_USER,
+        variables: { batchId: slug, token },
+      },
+      {
+        query: GET_BATCHES_BY_USER_TOKEN,
+        variables: { token, userId: userDataProp?.id },
+      },
+    ],
+    onCompleted: () => {
+      addToast("Details updated successfully", "success");
     },
   });
 
   const handleAddButton = () => {
     setStudentName("");
-    setAadharNumber(0);
+    setAadharNumber("");
     setFunctionType("add");
+    setConfirmDelete(null);
   };
 
   const handleAddMultipleButton = () => {
     setStudentName("");
-    setAadharNumber(0);
+    setAadharNumber("");
     setFunctionType("addMultiple");
+    setConfirmDelete(null);
+  };
+
+  const handleUpdateButton = (
+    studentName: string,
+    aadharNumber: string,
+    id: string
+  ) => {
+    setStudentName(studentName);
+    setAadharNumber(aadharNumber);
+    setUpdateId(id);
+    setFunctionType("update");
+    setConfirmDelete(null);
+    setAsign(null);
+  };
+
+  const handleUpdateDetailsButton = (
+    studentId: string,
+    aNo: string,
+    mob: string,
+    email: string,
+    address: string,
+    domicileState: string,
+    domicileDistrict: string,
+    idType: string,
+    dob: string,
+    gender: string,
+    maritalStatus: string,
+    father: string,
+    mother: string,
+    religion: string,
+    cast: string,
+    disability: boolean,
+    disabilityType: string,
+    employed: boolean,
+    employmentStatus: string,
+    employmentDetails: string,
+    trainingProgram: string
+  ) => {
+    setStudentDetails({
+      aadhar_number: aNo,
+      mobile: mob,
+      email: email,
+      address: address,
+      domicileState: domicileState,
+      domicileDistrict: domicileDistrict,
+      idType: idType,
+      dob: dob,
+      gender: gender,
+      maritalStatus: maritalStatus,
+      fatherGuardian: father,
+      motherGuardian: mother,
+      religion: religion,
+      castCategory: cast,
+      disability: disability,
+      disabilityType: disabilityType,
+      employed: employed,
+      employmentStatus: employmentStatus,
+      employmentDetails: employmentDetails,
+      trainingProgram: trainingProgram,
+    });
+
+    setUpdateId(studentId); // If needed, this can remain separate
+    setDetailsFunctionType("update");
   };
 
   if (batchLoading) {
@@ -215,10 +514,18 @@ const UserBatch = ({ slug }: Props) => {
           />
           <div className="cards">
             <div className="links">
-              <Link href="/user-dashboard/" className="link-back ">
+              <Link
+                title="Back to Dashboard"
+                href="/user-dashboard/"
+                className="link-back "
+              >
                 <ArrowLeft size={14} /> Dashboard
               </Link>
-              <Link href="/user-dashboard/batches/" className="link-back ">
+              <Link
+                title="Back to All Batches"
+                href="/user-dashboard/batches/"
+                className="link-back "
+              >
                 <ArrowLeft size={14} /> All Batches
               </Link>
             </div>
@@ -244,7 +551,7 @@ const UserBatch = ({ slug }: Props) => {
                 )
                 .sort((a, b) => a.studentName.localeCompare(b.studentName))
                 .map((student) => (
-                  <div className="card">
+                  <div className="card" key={student.id}>
                     <div className="student-info">
                       <p className="highlight-yellow">
                         {student.studentName} <span className="divider">|</span>{" "}
@@ -284,34 +591,139 @@ const UserBatch = ({ slug }: Props) => {
                           </span>
                         </p>
                         <p className="text-s">
-                          Full Aadhar:{" "}
+                          Aadhar:{" "}
                           <span className="highlight text-xs">
-                            {student.Details
-                              ? student.Details?.aadhar_number
-                              : student.aadhar_number}
+                            {student.aadhar_number}{" "}
+                            {student.details &&
+                              `| ${student.details?.aadhar_number}`}
                           </span>
                         </p>
                       </div>
                     </div>
                     <div className="settings">
                       <button
+                        title="Delete this Student"
+                        id="delete-button"
+                        onClick={() => {
+                          if (confirmDelete?.id === student.id) {
+                            setConfirmDelete(null);
+                          } else {
+                            setConfirmDelete({ id: student.id });
+                            setAsign(null);
+                          }
+                        }}
+                      >
+                        <Trash />
+                      </button>
+                      <button
+                        title="Assign this Student to another Batch"
                         onClick={() => {
                           if (asign?.id === student.id) {
                             setAsign(null);
                           } else {
                             setAsign({ id: student.id });
                             setAsignBatchId(student.batchId);
+                            setConfirmDelete(null);
                           }
                         }}
                       >
                         <Repeat />
                       </button>
-                      {student.Details && (
-                        <button>
-                          <Eye />
-                        </button>
-                      )}
+                      <button
+                        title="View or Add or Delete Fingerprints"
+                        onClick={() => {
+                          if (fingerPrintOpen?.id === student.id) {
+                            setFingerPrintOpen(null);
+                          } else {
+                            setFingerPrintOpen({ id: student.id });
+                          }
+                        }}
+                      >
+                        <Fingerprint />
+                      </button>
+                      <button
+                        title={
+                          student.details
+                            ? "View or Update Student Details"
+                            : "Add Student Details"
+                        }
+                        onClick={() => {
+                          if (student.details) {
+                            handleUpdateDetailsButton(
+                              student.id,
+                              student.details.aadhar_number,
+                              student.details.mobile,
+                              student.details.email,
+                              student.details.address,
+                              student.details.domicileState,
+                              student.details.domicileDistrict,
+                              student.details.idType,
+                              student.details.dob,
+                              student.details.gender,
+                              student.details.maritalStatus,
+                              student.details.fatherGuardian,
+                              student.details.motherGuardian,
+                              student.details.religion,
+                              student.details.castCategory,
+                              student.details.disability,
+                              student.details.disabilityType || "",
+                              student.details.employed,
+                              student.details.employmentStatus || "",
+                              student.details.employmentDetails || "",
+                              student.details.trainingProgram
+                            );
+                            setDetailsId(student.details.id);
+                          } else {
+                            setDetailsFunctionType("add");
+                            setStudentId(student.id);
+                          }
+                        }}
+                      >
+                        <ReceiptText />
+                      </button>
+                      <button
+                        title="Update Student"
+                        onClick={() => {
+                          handleUpdateButton(
+                            student.studentName,
+                            student.aadhar_number,
+                            student.id
+                          );
+                        }}
+                      >
+                        <Settings />
+                      </button>
                     </div>
+                    {confirmDelete && confirmDelete?.id === student.id && (
+                      <div className="confirm-delete">
+                        <p className="info-text">
+                          Are you sure you want to delete this admin?
+                        </p>
+                        <div className="buttons">
+                          <button
+                            title="Confirm Delete Student"
+                            className="delete"
+                            onClick={() => {
+                              deleteStudentByUserToken({
+                                variables: {
+                                  token: token,
+                                  deleteId: student.id,
+                                },
+                              });
+                            }}
+                            disabled={deleteStudentLoading}
+                          >
+                            {deleteStudentLoading ? "Deleting..." : "Confirm"}
+                          </button>
+                          <button
+                            title="Cancle Delete Student"
+                            onClick={() => setConfirmDelete(null)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
                     {asign && asign.id === student.id && (
                       <div className="asign">
                         <p className="info-text">
@@ -319,6 +731,7 @@ const UserBatch = ({ slug }: Props) => {
                         </p>
                         <div className="buttons">
                           <select
+                            title="Change Batch of this Student"
                             className="asign-select"
                             disabled={batchesDataProp?.length === 0}
                             value={asignBatchId || ""}
@@ -333,6 +746,7 @@ const UserBatch = ({ slug }: Props) => {
                               ))}
                           </select>
                           <button
+                            title="Confirm Assign Student to another Batch"
                             disabled={
                               !asignBatchId ||
                               assignLoading ||
@@ -360,9 +774,27 @@ const UserBatch = ({ slug }: Props) => {
                               </>
                             )}
                           </button>
-                          <button onClick={() => setAsign(null)}>Cancel</button>
+                          <button
+                            title="Cancle Assign Student to Batch"
+                            onClick={() => setAsign(null)}
+                          >
+                            Cancel
+                          </button>
                         </div>
                       </div>
+                    )}
+
+                    {fingerPrintOpen && fingerPrintOpen.id === student.id && (
+                      <AddFingers
+                        fingerPrintOpen={fingerPrintOpen}
+                        setfingerPrintOpen={setFingerPrintOpen}
+                        data={student}
+                        studentData={student.fingerprints}
+                        token={token}
+                        handleAddFinger={addFingerPrints}
+                        loading={addFingerPrintsLoading}
+                        slug={slug}
+                      />
                     )}
                   </div>
                 ))
@@ -372,6 +804,27 @@ const UserBatch = ({ slug }: Props) => {
           </div>
         </div>
       </section>
+      {detailsFunctionType !== "" && (
+        <AddDetails
+          detailsId={detailsId}
+          studentDetails={studentDetails}
+          setStudentDetails={setStudentDetails}
+          title={
+            detailsFunctionType === "add" ? "Add Details" : "update Details"
+          }
+          studentId={studentId}
+          setStudentId={setStudentId}
+          token={token}
+          functionType={detailsFunctionType}
+          setFunctionType={setDetailsFunctionType}
+          setStatusMessage={setStatusMessage}
+          statusMessage={statusMessage}
+          addDetailsToStudent={addDetailsToStudent}
+          updateDetailsOfStudent={updateDetailsOfStudent}
+          addDetailsLoading={addDetailsLoading}
+          updateDetailsLoading={updateDetailsLoading}
+        />
+      )}
       {functionType !== "" && (
         <AddUpdateStudentsPopup
           title={
@@ -384,12 +837,35 @@ const UserBatch = ({ slug }: Props) => {
           functionType={functionType}
           setFunctionType={setFunctionType}
           token={token}
-          handleSubmitFunction={addStudentsByUser}
-          loading={addStudentsLoading}
-          error={addStudentserror}
-          batchId={updateId}
+          handleSubmitFunction={
+            functionType === "add"
+              ? addStudentByUser
+              : functionType === "addMultiple"
+              ? addMultipleStudentsByUser
+              : updateStudentByUserToken
+          }
+          loading={
+            functionType === "add"
+              ? addStudentLoading
+              : functionType === "addMultiple"
+              ? addMultipleStudentsLoading
+              : updateStudentLoading
+          }
+          error={
+            functionType === "add"
+              ? addStudentError
+              : functionType === "addMultiple"
+              ? addMultipleStudentsError
+              : updateStudentError
+          }
+          batchId={slug}
           aadhar_number={aadharNumber}
+          setAadharNumber={setAadharNumber}
+          setStudentName={setStudentName}
           studentName={studentName}
+          updateId={updateId}
+          errorMessage={errorMessage}
+          setErrorMessage={setErrorMessage}
         />
       )}
     </>

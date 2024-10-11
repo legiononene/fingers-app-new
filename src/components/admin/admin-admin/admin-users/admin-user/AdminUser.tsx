@@ -197,10 +197,18 @@ const AdminUser = ({ slug }: { slug: string }) => {
 
         <div className="cards">
           <div className="links">
-            <Link href="/admin-dashboard/" className="link-back ">
+            <Link
+              title="Back to Dashboard"
+              href="/admin-dashboard/"
+              className="link-back "
+            >
               <ArrowLeft size={14} /> Dashboard
             </Link>
-            <Link href="/admin-dashboard/users/" className="link-back ">
+            <Link
+              title="Back to All Users"
+              href="/admin-dashboard/users/"
+              className="link-back "
+            >
               <ArrowLeft size={14} /> All Users
             </Link>
           </div>
@@ -272,6 +280,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                   </div>
                   <div className="settings">
                     <select
+                      title="Change State of Batch"
                       value={
                         state?.length !== 0 ? state[i] : batch.state.toString()
                       }
@@ -294,6 +303,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                       <option value="false">Inactive</option>
                     </select>
                     <button
+                      title="Assign Batch to another User"
                       onClick={() => {
                         if (asign?.id === batch.id) {
                           setAsign(null);
@@ -305,6 +315,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                       <Repeat />
                     </button>
                     <button
+                      title="View Batch"
                       onClick={() =>
                         router.push(
                           `/admin-dashboard/users/${slug}/${batch.id}`
@@ -322,6 +333,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
 
                       <div className="buttons">
                         <select
+                          title="Change User of this Batch"
                           className="asign-select"
                           disabled={usersDataProp?.length === 0}
                           value={asignUserId || ""}
@@ -336,6 +348,7 @@ const AdminUser = ({ slug }: { slug: string }) => {
                             ))}
                         </select>
                         <button
+                          title="Confirm Assign Batch to another User"
                           disabled={
                             !asignUserId ||
                             assignLoading ||
@@ -363,7 +376,12 @@ const AdminUser = ({ slug }: { slug: string }) => {
                             </>
                           )}
                         </button>
-                        <button onClick={() => setAsign(null)}>Cancel</button>
+                        <button
+                          title="Cancle Assign Batch To User"
+                          onClick={() => setAsign(null)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}

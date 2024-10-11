@@ -11,6 +11,7 @@
   "dependencies": {
     "@apollo/experimental-nextjs-app-support": "^0.11.3",
     "@prisma/client": "5.20.0",
+    "@techstark/opencv-js": "^4.10.0-release.1",
     "@use-gesture/react": "^10.3.1",
     "graphql": "^16.9.0",
     "js-base64": "^3.7.7",

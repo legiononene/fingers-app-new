@@ -226,6 +226,9 @@ export const GET_BATCH_BY_BATCH_ID = gql`
       outTime
       state
       userId
+      user {
+        userName
+      }
       updatedAt
       students {
         studentName
@@ -393,6 +396,7 @@ export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
           image
           priority
           studentId
+          name
         }
         details {
           aadhar_number
@@ -481,24 +485,132 @@ export const DELETE_BATCH_BY_USER_TOKEN = gql`
   }
 `;
 
-export const ADD_STUDENTS_TO_BATCH_BY_USER_TOKEN = gql`
+export const ADD_STUDENT_TO_BATCH_BY_USER_TOKEN = gql`
+  mutation Root_Mutation(
+    $token: String!
+    $batchId: String!
+    $aadhar_number: String!
+    $details: DetailsInput
+    $studentName: String
+  ) {
+    AddStudentByUserToken(
+      token: $token
+      BatchId: $batchId
+      aadhar_number: $aadhar_number
+      details: $details
+      studentName: $studentName
+    ) {
+      studentName
+    }
+  }
+`;
+
+export const ADD_MULTIPLE_STUDENTS_TO_BATCH_BY_USER_TOKEN = gql`
   mutation AddStudentsByUserToken(
     $token: String!
     $batchId: String!
-    $aadharNumber: Int!
-    $studentName: String
-    $state: [String!]
-    $details: DetailsInput
+    $students: [students_input]
   ) {
     AddStudentsByUserToken(
       token: $token
       BatchId: $batchId
-      aadhar_number: $aadharNumber
+      students: $students
+    ) {
+      studentName
+    }
+  }
+`;
+
+export const ADD_FINGERPRINTS_TO_STUDENT_BY_USER_TOKEN = gql`
+  mutation AddFingerPrintsToStudentByStudentIdByUserToken(
+    $token: String!
+    $studentId: ID!
+    $fingerPrints: [FingerPrintInput!]!
+  ) {
+    AddFingerPrintsToStudentByStudentIdByUserToken(
+      token: $token
+      id: $studentId
+      fingerPrints: $fingerPrints
+    ) {
+      studentName
+    }
+  }
+`;
+
+export const DELETE_FINGERPRINT_BY_FINGERPRINT_ID_BY_USER_TOKEN = gql`
+  mutation Root_Mutation($token: String!, $fingerprintId: ID!) {
+    deleteFingerPrintOfStudentByFingerPrintIdByUserToken(
+      token: $token
+      id: $fingerprintId
+    ) {
+      name
+    }
+  }
+`;
+
+export const UPDATE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
+  mutation UpdateStudentByStudentIdByUserToken(
+    $token: String!
+    $updateId: ID!
+    $studentName: String
+    $aadhar_number: String
+  ) {
+    updateStudentByStudentIdByUserToken(
+      token: $token
+      id: $updateId
       studentName: $studentName
-      state: $state
+      aadhar_number: $aadhar_number
+    ) {
+      studentName
+    }
+  }
+`;
+
+export const DELETE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
+  mutation DeleteStudentByStudentIdByUserToken(
+    $token: String!
+    $deleteId: ID!
+  ) {
+    deleteStudentByStudentIdByUserToken(token: $token, id: $deleteId) {
+      studentName
+    }
+  }
+`;
+
+export const ADD_DETAILS_TO_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
+  mutation Root_Mutation(
+    $token: String!
+    $studentId: String!
+    $details: DetailsInput
+  ) {
+    addDetailsToStudentByStudentIdByUserToken(
+      token: $token
+      StudentId: $studentId
       details: $details
     ) {
       studentName
+      details {
+        dob
+      }
+    }
+  }
+`;
+
+export const UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
+  mutation Root_Mutation(
+    $token: String!
+    $detailsId: String!
+    $details: DetailsInput
+  ) {
+    updateDetailsOfStudentByStudentIdByUserToken(
+      token: $token
+      detailsId: $detailsId
+      details: $details
+    ) {
+      studentName
+      details {
+        dob
+      }
     }
   }
 `;

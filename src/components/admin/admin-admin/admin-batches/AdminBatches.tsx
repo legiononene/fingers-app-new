@@ -175,7 +175,11 @@ const AdminBatches = () => {
 
         <div className="cards">
           <div className="links">
-            <Link href="/admin-dashboard/" className="link-back">
+            <Link
+              title="Back to dashboard"
+              href="/admin-dashboard/"
+              className="link-back"
+            >
               <ArrowLeft size={14} /> Dashboard
             </Link>
           </div>
@@ -251,6 +255,7 @@ const AdminBatches = () => {
                   </div>
                   <div className="settings">
                     <select
+                      title="Change State of Batch"
                       value={
                         state?.length !== 0 ? state[i] : batch.state.toString()
                       }
@@ -273,6 +278,7 @@ const AdminBatches = () => {
                       <option value="false">Inactive</option>
                     </select>
                     <button
+                      title="Assign Batch to another User"
                       onClick={() => {
                         if (asign?.id === batch.id) {
                           setAsign(null);
@@ -285,6 +291,7 @@ const AdminBatches = () => {
                       <Repeat />
                     </button>
                     <button
+                      title="View Batch"
                       onClick={() =>
                         router.push(`/admin-dashboard/batches/${batch.id}`)
                       }
@@ -300,6 +307,7 @@ const AdminBatches = () => {
 
                       <div className="buttons">
                         <select
+                          title="Change User of Batch"
                           className="asign-select"
                           disabled={batchdataProp?.length === 0}
                           value={asignUserId || ""}
@@ -314,6 +322,7 @@ const AdminBatches = () => {
                             ))}
                         </select>
                         <button
+                          title="Confirm Assign Batch to User"
                           disabled={
                             !asignUserId ||
                             assignLoading ||
@@ -341,7 +350,12 @@ const AdminBatches = () => {
                             </>
                           )}
                         </button>
-                        <button onClick={() => setAsign(null)}>Cancel</button>
+                        <button
+                          title="Cancle Asign Batch to User"
+                          onClick={() => setAsign(null)}
+                        >
+                          Cancel
+                        </button>
                       </div>
                     </div>
                   )}
