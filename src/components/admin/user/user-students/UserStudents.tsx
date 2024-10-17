@@ -21,6 +21,10 @@ import {
 import PinkCard from "@/components/default/pink-card/PinkCard";
 import AddFingers from "../addFingers/AddFingers";
 import { IST } from "@/utils/time";
+import {
+  ErrorApollo,
+  NetworkStatusApollo,
+} from "@/components/default/error-loading/ErrorLoading";
 
 type UserType = {
   getUserByUserToken: User;
@@ -56,16 +60,31 @@ const UserStudents = () => {
 
   const userDataProp = userData && userData.getUserByUserToken;
 
-  const { data: studentData } = useQuery<StudentsType>(
-    GET_ALL_STUDENTS_BY_USER_TOKEN,
-    {
-      variables: {
-        token,
-      },
-    }
-  );
+  const {
+    data: studentData,
+    error: studentError,
+    loading: studentLoading,
+    refetch: studentRefetch,
+  } = useQuery<StudentsType>(GET_ALL_STUDENTS_BY_USER_TOKEN, {
+    variables: {
+      token,
+    },
+  });
 
   const studentsDataType = studentData && studentData.getAllStudentsByUserToken;
+
+  useEffect(() => {
+    refetchUser();
+    studentRefetch();
+  }, []);
+
+  if (userLoading) {
+    return <NetworkStatusApollo />;
+  }
+
+  if (userError) {
+    return <ErrorApollo error={userError} />;
+  }
 
   return (
     <>
