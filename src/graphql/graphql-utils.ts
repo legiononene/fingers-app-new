@@ -614,3 +614,52 @@ export const UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
     }
   }
 `;
+
+
+export const GET_ALL_STUDENTS_BY_USER_TOKEN = gql`
+  query GetAllStudentsByUserToken($token: String!) {
+    getAllStudentsByUserToken(token: $token) {
+      updatedAt
+      createdAt
+      studentName
+      state
+      id
+      fingerprints {
+        id
+        image
+        name
+        priority
+      }
+      batchId
+      batch {
+        batchName
+        id
+      }
+      aadhar_number
+      details {
+        aadhar_number
+        address
+        castCategory
+        disability
+        disabilityType
+        dob
+        domicileDistrict
+        domicileState
+        email
+        employed
+        employmentDetails
+        employmentStatus
+        fatherGuardian
+        gender
+        id
+        idType
+        maritalStatus
+        mobile
+        motherGuardian
+        religion
+        studentId
+        trainingProgram
+      }
+    }
+  }
+`;

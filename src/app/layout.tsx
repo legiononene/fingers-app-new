@@ -18,7 +18,7 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-const roboto = Work_Sans({
+const workSans = Work_Sans({
   weight: ["100", "200", "300", "400", "500", "700", "800", "900"],
   style: ["normal", "italic"],
   subsets: ["latin"],
@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={roboto.className}>
+    <html lang="en" className={workSans.className}>
       <body>
         <ApolloWrapper>
           <ToastProvider>
