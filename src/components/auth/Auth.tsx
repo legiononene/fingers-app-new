@@ -58,7 +58,16 @@ const Auth = () => {
             ? "User"
             : "Unauthorize"
         }`,
-        "success"
+
+        `${
+          data.loginUser.role === "superAdmin"
+            ? "success"
+            : data.loginUser.role === "admin"
+            ? "success"
+            : data.loginUser.role === "user"
+            ? "success"
+            : "error"
+        }`
       );
 
       setUsername("");
