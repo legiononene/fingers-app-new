@@ -54,7 +54,9 @@ const Auth = () => {
             ? "Super Admin"
             : data.loginUser.role === "admin"
             ? "Admin"
-            : "User"
+            : data.loginUser.role === "user"
+            ? "User"
+            : "Unauthorize"
         }`,
         "success"
       );
