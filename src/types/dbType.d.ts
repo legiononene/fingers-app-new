@@ -17,7 +17,7 @@ type Details = {
   domicileState: string;
   domicileDistrict: string;
   idType: string;
-  dob: string;
+  dob: Date;
   gender: string;
   maritalStatus: string;
   fatherGuardian: string;

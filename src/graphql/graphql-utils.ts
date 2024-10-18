@@ -88,7 +88,9 @@ export const GET_ALL_BATCHES_BY_ADMIN = gql`
       inTime
       outTime
       state
-      userId
+      user {
+        id
+      }
       user {
         userName
         id
@@ -225,7 +227,7 @@ export const GET_BATCH_BY_BATCH_ID = gql`
       inTime
       outTime
       state
-      userId
+
       user {
         userName
       }
@@ -233,7 +235,7 @@ export const GET_BATCH_BY_BATCH_ID = gql`
       students {
         studentName
         aadhar_number
-        batchId
+
         createdAt
         updatedAt
         state
@@ -242,7 +244,6 @@ export const GET_BATCH_BY_BATCH_ID = gql`
           id
           image
           priority
-          studentId
         }
         details {
           aadhar_number
@@ -265,7 +266,7 @@ export const GET_BATCH_BY_BATCH_ID = gql`
           mobile
           motherGuardian
           religion
-          studentId
+
           trainingProgram
         }
       }
@@ -323,16 +324,16 @@ export const GET_ALL_STUDENTS_BY_ADMIN_TOKEN = gql`
         mobile
         motherGuardian
         religion
-        studentId
+
         trainingProgram
       }
       createdAt
-      batchId
+
       aadhar_number
       batch {
         batchName
         id
-        userId
+
         user {
           userName
           id
@@ -350,7 +351,7 @@ export const GET_USER = gql`
       updatedAt
       createdAt
       id
-      adminId
+
       batches {
         batchName
         createdAt
@@ -368,8 +369,8 @@ export const GET_USER = gql`
 `;
 
 export const GET_BATCHES_BY_USER_TOKEN = gql`
-  query Root_Query($token: String!, $userId: ID!) {
-    getAllBatchesByUserIdByUserToken(token: $token, userId: $userId) {
+  query Root_Query($token: String!) {
+    getAllBatchesByUserIdByUserToken(token: $token) {
       batchName
       createdAt
       id
@@ -380,7 +381,6 @@ export const GET_BATCHES_BY_USER_TOKEN = gql`
         studentName
       }
       updatedAt
-      userId
       user {
         userName
       }
@@ -409,12 +409,11 @@ export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
       inTime
       outTime
       state
-      userId
       updatedAt
       students {
         studentName
         aadhar_number
-        batchId
+
         createdAt
         updatedAt
         state
@@ -423,7 +422,7 @@ export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
           id
           image
           priority
-          studentId
+
           name
         }
         details {
@@ -447,7 +446,7 @@ export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
           mobile
           motherGuardian
           religion
-          studentId
+
           trainingProgram
         }
       }
@@ -516,14 +515,14 @@ export const DELETE_BATCH_BY_USER_TOKEN = gql`
 export const ADD_STUDENT_TO_BATCH_BY_USER_TOKEN = gql`
   mutation Root_Mutation(
     $token: String!
-    $batchId: String!
+    $batchId: ID!
     $aadhar_number: String!
     $details: DetailsInput
-    $studentName: String
+    $studentName: String!
   ) {
     AddStudentByUserToken(
       token: $token
-      BatchId: $batchId
+      batchId: $batchId
       aadhar_number: $aadhar_number
       details: $details
       studentName: $studentName
@@ -536,13 +535,13 @@ export const ADD_STUDENT_TO_BATCH_BY_USER_TOKEN = gql`
 export const ADD_MULTIPLE_STUDENTS_TO_BATCH_BY_USER_TOKEN = gql`
   mutation AddStudentsByUserToken(
     $token: String!
-    $batchId: String!
-    $students: [students_input]
+    $batchId: ID!
+    $students: [StudentInputType!]
   ) {
     AddStudentsByUserToken(
       token: $token
-      BatchId: $batchId
-      students: $students
+      batchId: $batchId
+      student: $students
     ) {
       studentName
     }
@@ -608,13 +607,13 @@ export const DELETE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
 export const ADD_DETAILS_TO_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
   mutation Root_Mutation(
     $token: String!
-    $studentId: String!
-    $details: DetailsInput
+    $studentId: ID!
+    $details: DetailsInput!
   ) {
     addDetailsToStudentByStudentIdByUserToken(
       token: $token
-      StudentId: $studentId
-      details: $details
+      studentId: $studentId
+      detail: $details
     ) {
       studentName
       details {
@@ -657,11 +656,10 @@ export const GET_ALL_STUDENTS_BY_USER_TOKEN = gql`
         name
         priority
       }
-      batchId
+
       batch {
         batchName
         id
-        userId
         user {
           userName
           id
@@ -689,7 +687,7 @@ export const GET_ALL_STUDENTS_BY_USER_TOKEN = gql`
         mobile
         motherGuardian
         religion
-        studentId
+
         trainingProgram
       }
     }

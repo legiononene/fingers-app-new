@@ -17,7 +17,7 @@ type DetailsHere = {
   domicileState: string;
   domicileDistrict: string;
   idType: string;
-  dob: string | null;
+  dob: Date | null;
   gender: string;
   maritalStatus: string;
   fatherGuardian: string;
@@ -126,7 +126,7 @@ const AddDetails = ({
       castCategory: "",
       disability: false,
       disabilityType: "",
-      dob: "",
+      dob: new Date(),
       domicileDistrict: "",
       domicileState: "",
       email: "",
@@ -241,12 +241,12 @@ const AddDetails = ({
                         .split("T")[0];
                     }
 
-                    return details.dob;
+                    return new Date(details.dob).toISOString().split("T")[0];
                   })()}
                   onChange={(e) => {
                     setDetails((prevDetails) => ({
                       ...prevDetails,
-                      dob: e.target.value,
+                      dob: new Date(e.target.value),
                     }));
                   }}
                 />
