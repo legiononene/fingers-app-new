@@ -298,16 +298,44 @@ export const GET_ALL_STUDENTS_BY_ADMIN_TOKEN = gql`
       id
       fingerprints {
         id
+        image
+        name
+        priority
       }
       details {
         aadhar_number
+        address
+        castCategory
+        disability
+        disabilityType
+        dob
+        domicileDistrict
+        domicileState
+        email
+        employed
+        employmentDetails
+        employmentStatus
+        fatherGuardian
+        gender
+        id
+        idType
+        maritalStatus
+        mobile
+        motherGuardian
+        religion
+        studentId
+        trainingProgram
       }
       createdAt
       batchId
       aadhar_number
       batch {
+        batchName
+        id
+        userId
         user {
           userName
+          id
         }
       }
     }
@@ -615,7 +643,6 @@ export const UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
   }
 `;
 
-
 export const GET_ALL_STUDENTS_BY_USER_TOKEN = gql`
   query GetAllStudentsByUserToken($token: String!) {
     getAllStudentsByUserToken(token: $token) {
@@ -634,6 +661,11 @@ export const GET_ALL_STUDENTS_BY_USER_TOKEN = gql`
       batch {
         batchName
         id
+        userId
+        user {
+          userName
+          id
+        }
       }
       aadhar_number
       details {

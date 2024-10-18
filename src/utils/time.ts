@@ -8,3 +8,10 @@ export const IST = {
   hour12: true,
   timeZone: "Asia/Kolkata",
 } as Intl.DateTimeFormatOptions;
+
+export const IST_DATE_ONLY = {
+  day: "2-digit",
+  month: "2-digit",
+  year: "numeric",
+  timeZone: "Asia/Kolkata",
+} as Intl.DateTimeFormatOptions;

@@ -284,6 +284,11 @@ select {
     padding-inline: 32vw;
   }
 
+  .detail_container {
+    display: flex;
+    flex-direction: column;
+  }
+
   .existing-fingers {
     display: flex;
     flex-direction: column;
@@ -317,6 +322,33 @@ select {
           }
         }
       }
+    }
+  }
+
+  .stu_info {
+    display: grid;
+    gap: rem(10);
+
+    max-height: 40vh;
+    max-height: 40svh;
+    overflow-y: scroll;
+
+    @include breakpoint(medium) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+
+      p:nth-of-type(1) {
+        grid-column: 1 / 1;
+      }
+
+      p:nth-of-type(2) {
+        grid-row: 2 / 3;
+      }
+    }
+
+    p {
+      display: flex;
+      flex-direction: column;
     }
   }
 
@@ -407,7 +439,8 @@ input:-webkit-autofill:active {
   caret-color: $c-text;
 }
 
-form {
+form,
+.detail_container {
   width: 100%;
   background-color: $c-link;
   border-radius: $b-radius;
@@ -633,5 +666,35 @@ form {
   &-inActive {
     color: $c-red;
     font-size: rem(28);
+  }
+}
+
+.datetime {
+  display: grid;
+  gap: rem(10);
+
+  @include breakpoint(medium) {
+    display: grid;
+  }
+
+  p {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .student-datetime {
+    display: grid;
+
+    @include breakpoint(medium) {
+      grid-template-columns: repeat(2, 1fr);
+
+      p:nth-of-type(1) {
+        grid-column: 1 / 1;
+      }
+
+      p:nth-of-type(2) {
+        grid-row: 2 / 3;
+      }
+    }
   }
 }
