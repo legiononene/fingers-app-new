@@ -413,7 +413,9 @@ export const GET_BATCH_BY_BATCH_ID_BY_USER = gql`
       students {
         studentName
         aadhar_number
-
+        batch {
+          id
+        }
         createdAt
         updatedAt
         state
@@ -579,8 +581,8 @@ export const UPDATE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
   mutation UpdateStudentByStudentIdByUserToken(
     $token: String!
     $updateId: ID!
-    $studentName: String
-    $aadhar_number: String
+    $studentName: String!
+    $aadhar_number: String!
   ) {
     updateStudentByStudentIdByUserToken(
       token: $token
@@ -626,13 +628,13 @@ export const ADD_DETAILS_TO_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
 export const UPDATE_DETAILS_OF_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN = gql`
   mutation Root_Mutation(
     $token: String!
-    $detailsId: String!
-    $details: DetailsInput
+    $detailsId: ID!
+    $details: DetailsInput!
   ) {
     updateDetailsOfStudentByStudentIdByUserToken(
       token: $token
-      detailsId: $detailsId
-      details: $details
+      detailId: $detailsId
+      detail: $details
     ) {
       studentName
       details {

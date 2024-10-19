@@ -379,6 +379,7 @@ const UserBatch = ({ slug }: Props) => {
       onCompleted: (data) => {
         addToast("Details added successfully", "success");
         console.log("data->", data);
+        setDetailsFunctionType("");
       },
     }
   );
@@ -404,6 +405,7 @@ const UserBatch = ({ slug }: Props) => {
     ],
     onCompleted: () => {
       addToast("Details updated successfully", "success");
+      setDetailsFunctionType("");
     },
   });
 
@@ -622,7 +624,7 @@ const UserBatch = ({ slug }: Props) => {
                             setAsign(null);
                           } else {
                             setAsign({ id: student.id });
-                            setAsignBatchId(student.batchId);
+                            setAsignBatchId(student.batch.id);
                             setConfirmDelete(null);
                           }
                         }}

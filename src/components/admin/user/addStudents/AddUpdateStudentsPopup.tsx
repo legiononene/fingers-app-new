@@ -148,7 +148,7 @@ const AddUpdateStudentsPopup = ({
                   />
                 </div>
                 <div className="form-field">
-                  <label className="highlight">Name:</label>
+                  <label className="highlight">Aadhar:</label>
                   <input
                     type="text"
                     placeholder="Aadhar No. (last 8 digits)"
@@ -168,7 +168,7 @@ const AddUpdateStudentsPopup = ({
           ) : (
             <div className="column-fields">
               <div className="form-field">
-                <label className="highlight">Aadhar:</label>
+                <label className="highlight">Name:</label>
                 <textarea
                   placeholder="Enter Student Name Line by line"
                   required
