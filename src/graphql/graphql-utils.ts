@@ -154,7 +154,7 @@ export const DELETE_USER = gql`
 `;
 
 export const GET_ALL_BATCHES_BY_USER_ID = gql`
-  query GetAllBatchesByUserId($token: String!, $userId: String) {
+  query GetAllBatchesByUserId($token: String!, $userId: ID!) {
     getAllBatchesByUserId(token: $token, id: $userId) {
       batchName
       createdAt
