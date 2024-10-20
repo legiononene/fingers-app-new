@@ -10,7 +10,6 @@ import {
   CHANGE_STATE_OF_BATCH,
   GET_ADMIN,
   GET_ALL_BATCHES_BY_ADMIN,
-  GET_ALL_BATCHES_BY_USER_ID,
   GET_ALL_USERS_BY_ADMIN,
 } from "@/graphql/graphql-utils";
 import PinkCard from "@/components/default/pink-card/PinkCard";

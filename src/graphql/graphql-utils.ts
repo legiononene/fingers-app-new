@@ -43,8 +43,8 @@ export const UPDATE_ADMIN = gql`
 `;
 
 export const DELETE_ADMIN = gql`
-  mutation DeleteAdmin($token: String!, $adminId: ID!) {
-    deleteAdminById(id: $adminId, token: $token) {
+  mutation DeleteAdmin($token: String!, $deleteId: ID!) {
+    deleteAdminById(id: $deleteId, token: $token) {
       userName
     }
   }

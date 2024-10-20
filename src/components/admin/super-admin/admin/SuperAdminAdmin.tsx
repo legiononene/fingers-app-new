@@ -157,6 +157,7 @@ const SuperAdminAdmin = () => {
   }
 
   //console.log("data->", adminData);
+  console.log("confirmDelete->", confirmDelete);
 
   return (
     <>
@@ -251,7 +252,7 @@ const SuperAdminAdmin = () => {
                         <DynamicConfirmDelete
                           deleteTitle="Admin"
                           token={token}
-                          deleteId={admin.id}
+                          deleteId={confirmDelete.id}
                           deleteFunction={deleteAdmin}
                           deleteLoading={deleteLoading}
                           cancelFunction={setConfirmDelete}
