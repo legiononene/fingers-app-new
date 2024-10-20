@@ -355,15 +355,10 @@ export const GET_USER = gql`
 
       batches {
         batchName
-        createdAt
-        id
-        inTime
-        outTime
-        state
+        
         students {
           studentName
         }
-        updatedAt
       }
     }
   }
