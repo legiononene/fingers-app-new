@@ -27,10 +27,14 @@ import {
 } from "lucide-react";
 import { IST } from "@/utils/time";
 import { useToast } from "@/contexts/toastContext";
-import AddUpdateAdminUserPopup from "../../super-admin/admin/addAdmin/AddUpdateAdminUserPopup";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/authContext";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import {
+  DynamicConfirmDeleteLoader,
+  DynamicPopupLoader,
+} from "@/utils/DynamicLoader";
 
 type Data = {
   getAdminByAdminToken: Admin;
@@ -39,6 +43,22 @@ type Data = {
 type UserData = {
   getAllUsersByAdminToken: User[];
 };
+
+const DynamicAddUpdateAdminUserPopup = dynamic(
+  () => import("../../super-admin/admin/addAdmin/AddUpdateAdminUserPopup"),
+  {
+    ssr: false,
+    loading: () => <DynamicPopupLoader />,
+  }
+);
+
+const DynamicConfirmDelete = dynamic(
+  () => import("@/components/default/confirmDelete/ConfirmDelete"),
+  {
+    ssr: false,
+    loading: () => <DynamicConfirmDeleteLoader />,
+  }
+);
 
 const AdminUsers = () => {
   const [role, setRole] = useState<string | null>(null);
@@ -294,34 +314,14 @@ const AdminUsers = () => {
                       </div>
 
                       {confirmDelete && confirmDelete?.id === user.id && (
-                        <div className="confirm-delete">
-                          <p className="info-text">
-                            Are you sure you want to delete this admin?
-                          </p>
-                          <div className="buttons">
-                            <button
-                              title="Confirm Delete User"
-                              className="delete"
-                              onClick={() => {
-                                deleteUserByAdmintoken({
-                                  variables: {
-                                    token: token,
-                                    deleteId: user.id,
-                                  },
-                                });
-                              }}
-                              disabled={deleteLoading}
-                            >
-                              {deleteLoading ? "Deleting..." : "Confirm"}
-                            </button>
-                            <button
-                              title="Cancle Delete User"
-                              onClick={() => setConfirmDelete(null)}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
+                        <DynamicConfirmDelete
+                          deleteTitle="User"
+                          token={token}
+                          deleteId={user.id}
+                          deleteFunction={deleteUserByAdmintoken}
+                          deleteLoading={deleteLoading}
+                          cancelFunction={setConfirmDelete}
+                        />
                       )}
                     </div>
                   </>
@@ -333,7 +333,7 @@ const AdminUsers = () => {
         </div>
       </section>
       {functionType !== "" && (
-        <AddUpdateAdminUserPopup
+        <DynamicAddUpdateAdminUserPopup
           setFunctionType={setFunctionType}
           handleSubmitFunction={
             functionType === "add"

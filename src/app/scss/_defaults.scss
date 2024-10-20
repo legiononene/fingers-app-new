@@ -615,6 +615,9 @@ form,
 
   p {
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: rem(10);
 
     @include breakpoint(medium) {
       width: 50%;
@@ -696,5 +699,39 @@ form,
         grid-row: 2 / 3;
       }
     }
+  }
+}
+
+#bg-wrap {
+  --color-gradient1-stop1: rgba(118, 73, 190, 1);
+  --color-gradient1-stop2: rgba(118, 73, 190, 0);
+
+  --color-gradient2-stop1: rgba(245, 198, 69, 1);
+  --color-gradient2-stop2: rgba(245, 198, 69, 0);
+
+  --color-gradient3-stop1: rgba(92, 182, 235, 1);
+  --color-gradient3-stop2: rgba(92, 182, 235, 0);
+
+  --color-gradient4-stop1: rgba(215, 245, 127, 1);
+  --color-gradient4-stop2: rgba(215, 245, 127, 0);
+
+  --color-gradient5-stop1: rgba(10, 54, 157, 1);
+  --color-gradient5-stop2: rgba(10, 54, 157, 0);
+
+  --color-gradient6-stop1: rgba(225, 67, 95, 1);
+  --color-gradient6-stop2: rgba(225, 67, 95, 0);
+
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+
+  @include breakpoint(medium) {
+    width: 180%;
+  }
+
+  @include breakpoint(large) {
+    width: 100%;
   }
 }

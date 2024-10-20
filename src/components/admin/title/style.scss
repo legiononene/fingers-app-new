@@ -4,10 +4,11 @@
   width: 100%;
   background-color: $c-bg;
   border-radius: $b-radius;
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: rem(10);
   padding: $p-l;
-  height: fit-content;
+  min-height: fit-content;
 
   @include breakpoint(medium) {
     width: 30%;

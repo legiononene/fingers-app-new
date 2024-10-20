@@ -170,7 +170,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                 </Link>
                 <Link
                   title={`Back to ${data?.getBatchByBatchId.user.userName} User`}
-                  href={`/admin-dashboard/users/${data?.getBatchByBatchId.userId}`}
+                  href={`/admin-dashboard/users/${data?.getBatchByBatchId.user.id}`}
                   className="link-back "
                 >
                   <ArrowLeft size={14} /> All Batches

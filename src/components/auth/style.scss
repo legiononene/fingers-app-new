@@ -2,6 +2,7 @@
 
 #auth {
   @include padding-block;
+
   .fg {
     display: flex;
     flex-direction: column;
@@ -19,14 +20,14 @@
       flex-direction: column;
       gap: rem(10);
       padding: $p-l;
-      height: fit-content;
+      min-height: fit-content;
 
       @include breakpoint(medium) {
-        width: 30%;
+        width: 50%;
       }
 
       @include breakpoint(large) {
-        width: 60%;
+        width: 100%;
       }
     }
 
@@ -43,12 +44,18 @@
 
     .empty {
       width: 100%;
+      position: relative;
+      overflow: hidden;
+      background-color: $c-bg;
+      min-height: 10vh;
+      min-height: 10svh;
+      max-height: auto;
       @include breakpoint(medium) {
-        width: 30%;
+        width: 50%;
       }
 
       @include breakpoint(large) {
-        width: 60%;
+        width: 100%;
       }
     }
   }

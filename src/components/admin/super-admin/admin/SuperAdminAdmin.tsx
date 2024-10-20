@@ -13,7 +13,6 @@ import {
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
 import { useToast } from "@/contexts/toastContext";
-import AddUpdateAdminUserPopup from "./addAdmin/AddUpdateAdminUserPopup";
 import {
   ADD_ADMIN,
   DELETE_ADMIN,
@@ -21,10 +20,31 @@ import {
   UPDATE_ADMIN,
 } from "@/graphql/graphql-utils";
 import { useAuth } from "@/contexts/authContext";
+import {
+  DynamicConfirmDeleteLoader,
+  DynamicPopupLoader,
+} from "@/utils/DynamicLoader";
+import dynamic from "next/dynamic";
 
 type Data = {
   getAllAdmins: Admin[] | undefined;
 };
+
+const DynamicAddUpdateAdminUserPopup = dynamic(
+  () => import("./addAdmin/AddUpdateAdminUserPopup"),
+  {
+    ssr: false,
+    loading: () => <DynamicPopupLoader />,
+  }
+);
+
+const DynamicConfirmDelete = dynamic(
+  () => import("@/components/default/confirmDelete/ConfirmDelete"),
+  {
+    ssr: false,
+    loading: () => <DynamicConfirmDeleteLoader />,
+  }
+);
 
 const SuperAdminAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -228,34 +248,14 @@ const SuperAdminAdmin = () => {
                         </button>
                       </div>
                       {confirmDelete?.id === admin.id && (
-                        <div className="confirm-delete">
-                          <p className="info-text">
-                            Are you sure you want to delete this admin?
-                          </p>
-                          <div className="buttons">
-                            <button
-                              title="Confirm Delete Admin"
-                              className="delete"
-                              onClick={() => {
-                                deleteAdmin({
-                                  variables: {
-                                    token: token,
-                                    adminId: admin.id,
-                                  },
-                                });
-                              }}
-                              disabled={deleteLoading}
-                            >
-                              {deleteLoading ? "Deleting..." : "Confirm"}
-                            </button>
-                            <button
-                              title="Cancle Delete Admin"
-                              onClick={() => setConfirmDelete(null)}
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
+                        <DynamicConfirmDelete
+                          deleteTitle="Admin"
+                          token={token}
+                          deleteId={admin.id}
+                          deleteFunction={deleteAdmin}
+                          deleteLoading={deleteLoading}
+                          cancelFunction={setConfirmDelete}
+                        />
                       )}
                     </div>
                   </>
@@ -268,7 +268,7 @@ const SuperAdminAdmin = () => {
       </section>
 
       {functionType !== "" && (
-        <AddUpdateAdminUserPopup
+        <DynamicAddUpdateAdminUserPopup
           setFunctionType={setFunctionType}
           handleSubmitFunction={
             functionType === "add" ? addAdminByToken : updateAdminById

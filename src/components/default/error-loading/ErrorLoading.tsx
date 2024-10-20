@@ -1,4 +1,6 @@
 import { ApolloError } from "@apollo/client";
+import { RefreshCw } from "lucide-react";
+import "@/components/admin/dashboard.scss";
 
 type Props = {
   error: ApolloError;
@@ -26,9 +28,18 @@ export const NoData = ({ type }: { type: string }) => {
 
 export const NetworkStatusApollo = () => {
   return (
-    <section id="SuperAdminAdmin">
-      <div className="fg p-l">
-        <p className="text-s">Loading...</p>
+    <section id="Dashboard">
+      <div
+        className="fg dashLoader"
+        style={{
+          height: "50vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "0.625rem",
+        }}
+      >
+        Loading <RefreshCw size={24} className="loader" />
       </div>
     </section>
   );

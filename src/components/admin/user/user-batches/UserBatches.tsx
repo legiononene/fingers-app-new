@@ -30,7 +30,12 @@ import {
 import { IST } from "@/utils/time";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/contexts/toastContext";
-import AddUpdateBatchStudentPopup from "../addbatch/AddUpdateBatchStudentPopup";
+import dynamic from "next/dynamic";
+
+import {
+  DynamicConfirmDeleteLoader,
+  DynamicPopupLoader,
+} from "@/utils/DynamicLoader";
 
 type BatchesData = {
   getAllBatchesByUserIdByUserToken: Batch[];
@@ -39,6 +44,22 @@ type BatchesData = {
 type UserType = {
   getUserByUserToken: User;
 };
+
+const DynamicAddUpdateBatchStudentPopup = dynamic(
+  () => import("../addbatch/AddUpdateBatchStudentPopup"),
+  {
+    ssr: false,
+    loading: () => <DynamicPopupLoader />,
+  }
+);
+
+const DynamicConfirmDelete = dynamic(
+  () => import("@/components/default/confirmDelete/ConfirmDelete"),
+  {
+    ssr: false,
+    loading: () => <DynamicConfirmDeleteLoader />,
+  }
+);
 
 const UserBatches = () => {
   const [role, setRole] = useState<string | null>(null);
@@ -290,7 +311,7 @@ const UserBatches = () => {
                         <p className="text-s">
                           Created At:{" "}
                           <span className="highlight text-xs">
-                            {new Date(parseInt(batch.createdAt))
+                            {new Date(batch.createdAt)
                               .toLocaleString("en-IN", IST)
                               .replace(",", " |")}
                           </span>
@@ -298,7 +319,7 @@ const UserBatches = () => {
                         <p className="text-s">
                           Updated At:{" "}
                           <span className="highlight text-xs">
-                            {new Date(parseInt(batch.updatedAt))
+                            {new Date(batch.updatedAt)
                               .toLocaleString("en-IN", IST)
                               .replace(",", " |")}
                           </span>
@@ -382,34 +403,14 @@ const UserBatches = () => {
                       </button>
                     </div>
                     {confirmDelete && confirmDelete?.id === batch.id && (
-                      <div className="confirm-delete">
-                        <p className="info-text">
-                          Are you sure you want to delete this admin?
-                        </p>
-                        <div className="buttons">
-                          <button
-                            title="Confirm Delete this Batch"
-                            className="delete"
-                            onClick={() => {
-                              deleteBatchByUserToken({
-                                variables: {
-                                  token: token,
-                                  deleteId: batch.id,
-                                },
-                              });
-                            }}
-                            disabled={deleteLoading}
-                          >
-                            {deleteLoading ? "Deleting..." : "Confirm"}
-                          </button>
-                          <button
-                            title="Cancle Delete this Batch"
-                            onClick={() => setConfirmDelete(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
+                      <DynamicConfirmDelete
+                        deleteTitle="Batch"
+                        token={token}
+                        deleteId={batch.id}
+                        deleteFunction={deleteBatchByUserToken}
+                        deleteLoading={deleteLoading}
+                        cancelFunction={setConfirmDelete}
+                      />
                     )}
                   </div>
                 ))
@@ -420,7 +421,7 @@ const UserBatches = () => {
         </div>
       </section>
       {functionType !== "" && (
-        <AddUpdateBatchStudentPopup
+        <DynamicAddUpdateBatchStudentPopup
           title={functionType === "add" ? "Add Batch" : "Update Batch"}
           setFunctionType={setFunctionType}
           functionType={functionType}

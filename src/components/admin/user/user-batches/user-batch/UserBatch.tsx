@@ -37,9 +37,11 @@ import {
   UPDATE_STUDENT_BY_STUDENT_ID_BY_USER_TOKEN,
 } from "@/graphql/graphql-utils";
 import { useToast } from "@/contexts/toastContext";
-import AddUpdateStudentsPopup from "../../addStudents/AddUpdateStudentsPopup";
-import AddFingers from "../../addFingers/AddFingers";
-import AddDetails from "../../addDetails/AddDetails";
+import dynamic from "next/dynamic";
+import {
+  DynamicConfirmDeleteLoader,
+  DynamicPopupLoader,
+} from "@/utils/DynamicLoader";
 
 type Props = {
   slug: string;
@@ -56,6 +58,31 @@ type BatchData = {
 type BatchesData = {
   getAllBatchesByUserIdByUserToken: Batch[];
 };
+
+const DynamicAddFingers = dynamic(() => import("../../addFingers/AddFingers"), {
+  ssr: false,
+  loading: () => <DynamicPopupLoader />,
+});
+
+const DynamicAddDetails = dynamic(() => import("../../addDetails/AddDetails"), {
+  ssr: false,
+  loading: () => <DynamicPopupLoader />,
+});
+
+const DynamicAddUpdateStudentsPopup = dynamic(
+  () => import("../../addStudents/AddUpdateStudentsPopup"),
+  {
+    ssr: false,
+    loading: () => <DynamicPopupLoader />,
+  }
+);
+const DynamicConfirmDelete = dynamic(
+  () => import("../../../../default/confirmDelete/ConfirmDelete"),
+  {
+    ssr: false,
+    loading: () => <DynamicConfirmDeleteLoader />,
+  }
+);
 
 const UserBatch = ({ slug }: Props) => {
   const [role, setRole] = useState<string | null>(null);
@@ -566,7 +593,7 @@ const UserBatch = ({ slug }: Props) => {
                         <p className="text-s">
                           Created At:{" "}
                           <span className="highlight text-xs">
-                            {new Date(parseInt(student.createdAt))
+                            {new Date(student.createdAt)
                               .toLocaleString("en-IN", IST)
                               .replace(",", " |")}
                           </span>
@@ -574,7 +601,7 @@ const UserBatch = ({ slug }: Props) => {
                         <p className="text-s">
                           Updated At:{" "}
                           <span className="highlight text-xs">
-                            {new Date(parseInt(student.updatedAt))
+                            {new Date(student.updatedAt)
                               .toLocaleString("en-IN", IST)
                               .replace(",", " |")}
                           </span>
@@ -697,34 +724,14 @@ const UserBatch = ({ slug }: Props) => {
                       </button>
                     </div>
                     {confirmDelete && confirmDelete?.id === student.id && (
-                      <div className="confirm-delete">
-                        <p className="info-text">
-                          Are you sure you want to delete this admin?
-                        </p>
-                        <div className="buttons">
-                          <button
-                            title="Confirm Delete Student"
-                            className="delete"
-                            onClick={() => {
-                              deleteStudentByUserToken({
-                                variables: {
-                                  token: token,
-                                  deleteId: student.id,
-                                },
-                              });
-                            }}
-                            disabled={deleteStudentLoading}
-                          >
-                            {deleteStudentLoading ? "Deleting..." : "Confirm"}
-                          </button>
-                          <button
-                            title="Cancle Delete Student"
-                            onClick={() => setConfirmDelete(null)}
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
+                      <DynamicConfirmDelete
+                        deleteTitle="Student"
+                        token={token}
+                        deleteId={student.id}
+                        deleteFunction={deleteStudentByUserToken}
+                        deleteLoading={deleteStudentLoading}
+                        cancelFunction={setConfirmDelete}
+                      />
                     )}
                     {asign && asign.id === student.id && (
                       <div className="asign">
@@ -787,7 +794,7 @@ const UserBatch = ({ slug }: Props) => {
                     )}
 
                     {fingerPrintOpen && fingerPrintOpen.id === student.id && (
-                      <AddFingers
+                      <DynamicAddFingers
                         fingerPrintOpen={fingerPrintOpen}
                         setfingerPrintOpen={setFingerPrintOpen}
                         data={student}
@@ -807,7 +814,7 @@ const UserBatch = ({ slug }: Props) => {
         </div>
       </section>
       {detailsFunctionType !== "" && (
-        <AddDetails
+        <DynamicAddDetails
           detailsId={detailsId}
           studentDetails={studentDetails}
           setStudentDetails={setStudentDetails}
@@ -828,7 +835,7 @@ const UserBatch = ({ slug }: Props) => {
         />
       )}
       {functionType !== "" && (
-        <AddUpdateStudentsPopup
+        <DynamicAddUpdateStudentsPopup
           title={
             functionType === "add"
               ? "Add Student"

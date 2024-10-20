@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/authContext";
 import { gql, useMutation } from "@apollo/client";
 import { useToast } from "@/contexts/toastContext";
 import { useRouter } from "next/navigation";
+import AnimationBg from "@/utils/AnimationBg";
 
 const login = gql`
   mutation logIn($userName: String!, $password: String!) {
@@ -147,7 +148,9 @@ const Auth = () => {
           </form>
         </div>
 
-        <div className="card empty"></div>
+        <div className="card empty">
+          <AnimationBg />
+        </div>
       </div>
     </section>
   );
