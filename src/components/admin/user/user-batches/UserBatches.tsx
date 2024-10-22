@@ -18,6 +18,7 @@ import {
   ArrowLeft,
   Eye,
   GraduationCap,
+  RefreshCw,
   Settings,
   Shield,
   Trash,
@@ -61,9 +62,12 @@ const DynamicConfirmDelete = dynamic(
   }
 );
 
+const LIMIT = 10;
+
 const UserBatches = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [state, setState] = useState<string[]>([]);
   const [functionType, setFunctionType] = useState<"add" | "update" | "">("");
   const [batchName, setBatchName] = useState<string>("");
@@ -73,6 +77,7 @@ const UserBatches = () => {
   const [confirmDelete, setConfirmDelete] = useState<{ id: string } | null>(
     null
   );
+  const [start, setStart] = useState<number>(0);
 
   const { token } = useAuth();
   const { addToast } = useToast();
@@ -105,12 +110,39 @@ const UserBatches = () => {
   } = useQuery<BatchesData>(GET_BATCHES_BY_USER_TOKEN, {
     variables: {
       token,
-      userId: userDataProp?.id,
+      limit: LIMIT,
+      start,
     },
   });
 
   const batchesDataProp =
     batchesData && batchesData.getAllBatchesByUserIdByUserToken;
+
+  const totalData = userData?.getUserByUserToken.batches.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push(`/user-dashboard/batches/#Header`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push(`/user-dashboard/batches/#Header`);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   //console.log("batchData->", batchData);
 
@@ -274,11 +306,34 @@ const UserBatches = () => {
             <PinkCard
               title="Batches"
               icon={<Shield size={14} strokeWidth={3} />}
-              data={batchesDataProp}
+              data={userData?.getUserByUserToken.batches}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               handleAddButton={handleAddButton}
+              loading={searchTerm !== debouncedSearchTerm}
             />
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {batchesLoading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
             {userData && batchesDataProp && batchesDataProp.length > 0 ? (
               batchesDataProp
                 .filter((batch) =>
@@ -415,8 +470,41 @@ const UserBatches = () => {
                   </div>
                 ))
             ) : (
-              <div className="card">No Batches available.</div>
+              <>
+                {batchesLoading ? (
+                  <div className="card">
+                    <span>
+                      Loading{" "}
+                      <RefreshCw size={14} strokeWidth={3} className="loader" />
+                    </span>{" "}
+                  </div>
+                ) : (
+                  <div className="card">No Batches available.</div>
+                )}
+              </>
             )}
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {batchesLoading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </section>

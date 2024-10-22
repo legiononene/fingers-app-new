@@ -4,8 +4,10 @@ import "@/components/admin/dashboard.scss";
 import {
   GET_ADMIN,
   GET_ALL_BATCHES_BY_ADMIN,
+  GET_ALL_BATCHES_BY_ADMIN_LENGTH,
   GET_ALL_STUDENTS_BY_ADMIN,
   GET_ALL_USERS_BY_ADMIN,
+  GET_ALL_USERS_BY_ADMIN_LENGTH,
 } from "@/graphql/graphql-utils";
 import { useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
@@ -17,6 +19,7 @@ import {
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
 import { useAuth } from "@/contexts/authContext";
+import { start } from "repl";
 
 type Data = {
   getAdminByAdminToken: Admin;
@@ -56,9 +59,11 @@ const Admindashboard = () => {
     error: userError,
     loading: userLoading,
     refetch: refetchUser,
-  } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN, {
+  } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN_LENGTH, {
     variables: {
       token,
+      limit: 1000,
+      start: 0,
     },
   });
 
@@ -67,9 +72,11 @@ const Admindashboard = () => {
     error: batchError,
     loading: batchLoading,
     refetch: refetchBatch,
-  } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN, {
+  } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN_LENGTH, {
     variables: {
       token,
+      limit: 1000,
+      start: 0,
     },
   });
 
@@ -81,6 +88,8 @@ const Admindashboard = () => {
   } = useQuery<StudentData>(GET_ALL_STUDENTS_BY_ADMIN, {
     variables: {
       token,
+      limit: 20000,
+      start: 0,
     },
   });
 

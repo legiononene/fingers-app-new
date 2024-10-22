@@ -57,7 +57,7 @@ const Header = () => {
   }
 
   return (
-    <header>
+    <header id="Header">
       <div className="fg">
         <Link title="Go to Fingers App" href="/">
           Fingers

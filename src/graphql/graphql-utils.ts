@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_ALL_ADMINS = gql`
-  query getAllAdmins($token: String!) {
-    getAllAdmins(token: $token) {
+  query getAllAdmins($token: String!, $limit: Float, $start: Float) {
+    getAllAdmins(token: $token, limit: $limit, start: $start) {
       createdAt
       id
       role
@@ -62,9 +62,18 @@ export const GET_ADMIN = gql`
   }
 `;
 
+export const GET_ALL_USERS_BY_ADMIN_LENGTH = gql`
+  query getAllUsersByAdminToken($token: String!, $limit: Float, $start: Float) {
+    getAllUsersByAdminToken(token: $token, limit: $limit, start: $start) {
+      id
+      userName
+    }
+  }
+`;
+
 export const GET_ALL_USERS_BY_ADMIN = gql`
-  query getAllUsersByAdminToken($token: String!) {
-    getAllUsersByAdminToken(token: $token) {
+  query getAllUsersByAdminToken($token: String!, $limit: Float, $start: Float) {
+    getAllUsersByAdminToken(token: $token, limit: $limit, start: $start) {
       batches {
         batchName
         students {
@@ -79,9 +88,27 @@ export const GET_ALL_USERS_BY_ADMIN = gql`
   }
 `;
 
+export const GET_ALL_BATCHES_BY_ADMIN_LENGTH = gql`
+  query getAllBatchesByAdmin($token: String!, $limit: Float, $start: Float) {
+    getAllBatchesByAdminId(token: $token, limit: $limit, start: $start) {
+      batchName
+      id
+    }
+  }
+`;
+
+export const GET_ALL_BATCHES_ID_BATCHNAME_BY_ADMIN = gql`
+query getAllBatchesByAdmin($token: String!, $limit: Float, $start: Float) {
+    getAllBatchesByAdminId(token: $token, limit: $limit, start: $start) {
+      batchName
+      id
+    }
+  }
+`;
+
 export const GET_ALL_BATCHES_BY_ADMIN = gql`
-  query getAllBatchesByAdmin($token: String!) {
-    getAllBatchesByAdminId(token: $token) {
+  query getAllBatchesByAdmin($token: String!, $limit: Float, $start: Float) {
+    getAllBatchesByAdminId(token: $token, limit: $limit, start: $start) {
       batchName
       createdAt
       id
@@ -104,8 +131,8 @@ export const GET_ALL_BATCHES_BY_ADMIN = gql`
 `;
 
 export const GET_ALL_STUDENTS_BY_ADMIN = gql`
-  query getAllStudentsByAdmin($token: String!) {
-    getAllStudentByAdminId(token: $token) {
+  query getAllStudentsByAdmin($token: String!, $limit: Float, $start: Float) {
+    getAllStudentByAdminId(token: $token, limit: $limit, start: $start) {
       studentName
     }
   }
@@ -154,8 +181,18 @@ export const DELETE_USER = gql`
 `;
 
 export const GET_ALL_BATCHES_BY_USER_ID = gql`
-  query GetAllBatchesByUserId($token: String!, $userId: ID!) {
-    getAllBatchesByUserId(token: $token, id: $userId) {
+  query GetAllBatchesByUserId(
+    $token: String!
+    $userId: ID!
+    $limit: Float
+    $start: Float
+  ) {
+    getAllBatchesByUserId(
+      token: $token
+      id: $userId
+      limit: $limit
+      start: $start
+    ) {
       batchName
       createdAt
       id
@@ -218,6 +255,58 @@ export const CHANGE_STATE_OF_BATCH = gql`
   }
 `;
 
+export const GET_ALL_STUDENTS_BY_BATCH_ID_BY_USER_TOKEN = gql`
+  query GetAllStudentsByBatchId(
+    $batchId: ID!
+    $token: String!
+    $start: Float
+    $limit: Float
+  ) {
+    getAllStudentsByBatchId(
+      id: $batchId
+      token: $token
+      start: $start
+      limit: $limit
+    ) {
+      studentName
+      aadhar_number
+      createdAt
+      updatedAt
+      state
+      id
+      fingerprints {
+        id
+        image
+        priority
+      }
+      details {
+        aadhar_number
+        address
+        castCategory
+        disability
+        disabilityType
+        dob
+        domicileDistrict
+        domicileState
+        email
+        employed
+        employmentDetails
+        employmentStatus
+        fatherGuardian
+        gender
+        id
+        idType
+        maritalStatus
+        mobile
+        motherGuardian
+        religion
+
+        trainingProgram
+      }
+    }
+  }
+`;
+
 export const GET_BATCH_BY_BATCH_ID = gql`
   query GetBatchByBatchId($token: String!, $batchId: ID!) {
     getBatchByBatchId(token: $token, id: $batchId) {
@@ -229,7 +318,7 @@ export const GET_BATCH_BY_BATCH_ID = gql`
       state
 
       user {
-        id,
+        id
         userName
       }
       updatedAt
@@ -291,9 +380,18 @@ export const ASSIGN_BATCH_TO_STUDENT = gql`
   }
 `;
 
+export const GET_ALL_STUDENTS_LENGTH_BY_ADMNI_TOKEN = gql`
+query GetAllStudentByAdminId($token: String!, $start: Float, $limit: Float) {
+    getAllStudentByAdminId(token: $token, start: $start, limit: $limit) {
+      studentName
+      id
+    }
+  }
+`;
+
 export const GET_ALL_STUDENTS_BY_ADMIN_TOKEN = gql`
-  query GetAllStudentByAdminId($token: String!) {
-    getAllStudentByAdminId(token: $token) {
+  query GetAllStudentByAdminId($token: String!, $start: Float, $limit: Float) {
+    getAllStudentByAdminId(token: $token, start: $start, limit: $limit) {
       updatedAt
       studentName
       state
@@ -355,7 +453,7 @@ export const GET_USER = gql`
 
       batches {
         batchName
-        
+
         students {
           studentName
         }
@@ -365,8 +463,12 @@ export const GET_USER = gql`
 `;
 
 export const GET_BATCHES_BY_USER_TOKEN = gql`
-  query Root_Query($token: String!) {
-    getAllBatchesByUserIdByUserToken(token: $token) {
+  query Root_Query($token: String!, $start: Float, $limit: Float) {
+    getAllBatchesByUserIdByUserToken(
+      token: $token
+      start: $start
+      limit: $limit
+    ) {
       batchName
       createdAt
       id
@@ -392,6 +494,17 @@ export const CHANGE_STATE_OF_BATCH_BY_USER = gql`
       batchId: $batchId
     ) {
       batchName
+    }
+  }
+`;
+
+export const GET_ALL_STUDENTS_LENGTH_BY_BATCH_ID_BY_USER = gql`
+  query Root_Query($token: String!, $batchId: ID!) {
+    getBatchByBatchIdByUserToken(token: $token, id: $batchId) {
+      id
+      students {
+        studentName
+      }
     }
   }
 `;

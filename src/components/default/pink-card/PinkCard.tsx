@@ -1,4 +1,10 @@
-import { Search, ShieldPlus, UserRoundPlus, UsersRound } from "lucide-react";
+import {
+  RefreshCw,
+  Search,
+  ShieldPlus,
+  UserRoundPlus,
+  UsersRound,
+} from "lucide-react";
 
 type Props = {
   title: string | undefined;
@@ -8,6 +14,7 @@ type Props = {
   setSearchTerm: (searchTerm: string) => void;
   handleAddButton?: () => void;
   handleAddMultipleButton?: () => void;
+  loading?: boolean;
 };
 
 const PinkCard = ({
@@ -18,6 +25,7 @@ const PinkCard = ({
   setSearchTerm,
   handleAddButton,
   handleAddMultipleButton,
+  loading = false,
 }: Props) => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -58,7 +66,15 @@ const PinkCard = ({
             onChange={handleSearchChange}
             className="search-input"
           />
-          <Search className="search-icon" />
+          {loading ? (
+            <RefreshCw
+              size={18}
+              strokeWidth={3}
+              className="loader search-icon"
+            />
+          ) : (
+            <Search className="search-icon" />
+          )}
         </div>
       </div>
       <div className="buttons">
@@ -78,9 +94,7 @@ const PinkCard = ({
             title="Add Multiple Students"
             id="add-button"
             onClick={handleAddMultipleButton}
-          >
-            <UsersRound />
-          </button>
+          ></button>
         )}
       </div>
     </div>

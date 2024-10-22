@@ -10,6 +10,7 @@ import {
   CHANGE_STATE_OF_BATCH,
   GET_ADMIN,
   GET_ALL_BATCHES_BY_ADMIN,
+  GET_ALL_BATCHES_BY_ADMIN_LENGTH,
   GET_ALL_USERS_BY_ADMIN,
 } from "@/graphql/graphql-utils";
 import PinkCard from "@/components/default/pink-card/PinkCard";
@@ -42,13 +43,17 @@ type UsersData = {
   getAllUsersByAdminToken: User[];
 };
 
+const LIMIT = 15;
+
 const AdminBatches = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [state, setState] = useState<string[]>([]);
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignUserId, setAsignUserId] = useState<string | null>(null);
+  const [start, setStart] = useState<number>(0);
 
   const router = useRouter();
   const { addToast } = useToast();
@@ -72,6 +77,19 @@ const AdminBatches = () => {
   });
 
   const {
+    data: batchDataLength,
+    error: batchErrorLength,
+    loading: batchLoadingLength,
+    refetch: refetchLength,
+  } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN_LENGTH, {
+    variables: {
+      token,
+      limit: 20000,
+      start: 0,
+    },
+  });
+
+  const {
     data: batchData,
     error: batchError,
     loading: batchLoading,
@@ -79,6 +97,8 @@ const AdminBatches = () => {
   } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN, {
     variables: {
       token,
+      limli: LIMIT,
+      start,
     },
   });
 
@@ -140,6 +160,32 @@ const AdminBatches = () => {
     refetch();
   }, []);
 
+  const totalData = batchDataLength?.getAllBatchesByAdminId.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push("/admin-dashboard/batches/#Header");
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push("/admin-dashboard/batches/#Header");
+    }
+  };
+
   if (batchLoading) {
     return <NetworkStatusApollo />;
   }
@@ -185,14 +231,36 @@ const AdminBatches = () => {
           <PinkCard
             title="Batches"
             icon={<Shield size={14} strokeWidth={3} />}
-            data={batchdataProp}
+            data={batchDataLength?.getAllBatchesByAdminId}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            loading={searchTerm !== debouncedSearchTerm}
           />
+          <div className="prev_next">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {batchLoading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
           {adminData && batchdataProp && batchdataProp.length > 0 ? (
             batchdataProp
               .filter((batch) =>
-                batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
+                batch.batchName
+                  .toLowerCase()
+                  .includes(debouncedSearchTerm.toLowerCase())
               )
               .sort((a, b) => a.batchName.localeCompare(b.batchName))
               .map((batch: Batch, i) => (
@@ -363,6 +431,25 @@ const AdminBatches = () => {
           ) : (
             <div className="card">No Batches available.</div>
           )}
+          <div className="prev_next">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {batchLoading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </section>

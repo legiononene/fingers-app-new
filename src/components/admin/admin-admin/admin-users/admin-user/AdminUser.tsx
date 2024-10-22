@@ -47,12 +47,17 @@ type UsersData = {
   getAllUsersByAdminToken: User[];
 };
 
+const LIMIT = 10;
+
 const AdminUser = ({ slug }: { slug: string }) => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignUserId, setAsignUserId] = useState<string | null>(slug);
   const [state, setState] = useState<string[]>([]);
+  const [start, setStart] = useState<number>(0);
 
   const router = useRouter();
   const { addToast } = useToast();
@@ -81,6 +86,8 @@ const AdminUser = ({ slug }: { slug: string }) => {
       variables: {
         token,
         userId: slug,
+        limit: LIMIT,
+        start,
       },
     }
   );
@@ -96,6 +103,8 @@ const AdminUser = ({ slug }: { slug: string }) => {
   } = useQuery<UsersData>(GET_ALL_USERS_BY_ADMIN, {
     variables: {
       token,
+      limit: 5000,
+      start: 0,
     },
   });
 
@@ -161,6 +170,32 @@ const AdminUser = ({ slug }: { slug: string }) => {
 
   const BatchesData = data?.getAllBatchesByUserId;
 
+  const totalData = userData?.getUserByUserId.batches.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push(`/admin-dashboard/users/${slug}/#Header`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push(`/admin-dashboard/users/${slug}/#Header`);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   //console.log("BatchesData->", BatchesData);
 
   if (loading) {
@@ -218,13 +253,32 @@ const AdminUser = ({ slug }: { slug: string }) => {
             data={userDataProp}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            loading={searchTerm !== debouncedSearchTerm}
           />
-          {data &&
-          data.getAllBatchesByUserId &&
-          BatchesData &&
-          data.getAllBatchesByUserId.length > 0 ? (
+          <div className="prev_next" id="PrevNext">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {loading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
+          {BatchesData && data.getAllBatchesByUserId.length > 0 ? (
             BatchesData.filter((batch) =>
-              batch.batchName.toLowerCase().includes(searchTerm.toLowerCase())
+              batch.batchName
+                .toLowerCase()
+                .includes(debouncedSearchTerm.toLowerCase())
             )
               .sort((a, b) => a.batchName.localeCompare(b.batchName))
               .map((batch: Batch, i) => (
@@ -390,6 +444,25 @@ const AdminUser = ({ slug }: { slug: string }) => {
           ) : (
             <div className="card">No Batches available.</div>
           )}
+          <div className="prev_next">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {loading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </section>

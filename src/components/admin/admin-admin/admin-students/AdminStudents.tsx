@@ -11,6 +11,7 @@ import {
   GET_ADMIN,
   GET_ALL_BATCHES_BY_ADMIN,
   GET_ALL_STUDENTS_BY_ADMIN_TOKEN,
+  GET_ALL_STUDENTS_LENGTH_BY_ADMNI_TOKEN,
 } from "@/graphql/graphql-utils";
 import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
@@ -28,6 +29,7 @@ import PinkCard from "@/components/default/pink-card/PinkCard";
 import { IST } from "@/utils/time";
 import { useToast } from "@/contexts/toastContext";
 import DetailsPopup from "./DetailsPopup";
+import { useRouter } from "next/navigation";
 
 type AdminData = {
   getAdminByAdminToken: Admin;
@@ -41,12 +43,16 @@ type BatchData = {
   getAllBatchesByAdminId: Batch[];
 };
 
+const LIMIT = 10;
+
 const AdminStudents = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignBatchId, setAsignBatchId] = useState<string | null>(null);
   const [openDetailsId, setOpenDetailsId] = useState<string>("");
+  const [start, setStart] = useState<number>(0);
 
   const { token } = useAuth();
 
@@ -66,16 +72,60 @@ const AdminStudents = () => {
     },
   });
 
+  const {
+    data: lengthData,
+    error: lengthError,
+    loading: lengthLoading,
+    refetch: lengthRefetch,
+  } = useQuery<Data>(GET_ALL_STUDENTS_LENGTH_BY_ADMNI_TOKEN, {
+    variables: {
+      token,
+      limit: 5000,
+      start: 0,
+    },
+  });
+
   const { data, error, loading, refetch } = useQuery<Data>(
     GET_ALL_STUDENTS_BY_ADMIN_TOKEN,
     {
       variables: {
         token,
+        limit: LIMIT,
+        start,
       },
     }
   );
 
+  const totalData = lengthData?.getAllStudentByAdminId.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  const router = useRouter();
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push("/admin-dashboard/students/#Header");
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push("/admin-dashboard/students/#Header");
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const StudentsData = data?.getAllStudentByAdminId || [];
+
   const { addToast } = useToast();
 
   console.log("StudentsData->", StudentsData);
@@ -158,10 +208,33 @@ const AdminStudents = () => {
             <PinkCard
               title="Students"
               icon={<GraduationCap size={16} strokeWidth={3} />}
-              data={StudentsData}
+              data={lengthData?.getAllStudentByAdminId}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
+              loading={searchTerm !== debouncedSearchTerm}
             />
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {loading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
             {adminData && StudentsData && StudentsData.length > 0 ? (
               StudentsData.filter(
                 (student) =>
@@ -319,8 +392,41 @@ const AdminStudents = () => {
                   </div>
                 ))
             ) : (
-              <div className="card">No Students available.</div>
+              <>
+                {loading ? (
+                  <div className="card">
+                    <span>
+                      Loading{" "}
+                      <RefreshCw size={14} strokeWidth={3} className="loader" />
+                    </span>{" "}
+                  </div>
+                ) : (
+                  <div className="card">No Students available.</div>
+                )}
+              </>
             )}
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {loading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </section>

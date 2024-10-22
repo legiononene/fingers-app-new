@@ -9,6 +9,7 @@ import {
   DELETE_USER,
   GET_ADMIN,
   GET_ALL_USERS_BY_ADMIN,
+  GET_ALL_USERS_BY_ADMIN_LENGTH,
   UPDATE_USER,
 } from "@/graphql/graphql-utils";
 import {
@@ -20,6 +21,7 @@ import {
   ArrowLeft,
   Eye,
   GraduationCap,
+  RefreshCw,
   Settings,
   Shield,
   Trash,
@@ -60,9 +62,12 @@ const DynamicConfirmDelete = dynamic(
   }
 );
 
+const LIMIT = 10;
+
 const AdminUsers = () => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<{ id: string } | null>(
     null
   );
@@ -71,6 +76,7 @@ const AdminUsers = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [updateId, setUpdateId] = useState<string>("");
+  const [start, setStart] = useState<number>(0);
 
   const { addToast } = useToast();
   const router = useRouter();
@@ -89,6 +95,19 @@ const AdminUsers = () => {
   });
 
   const {
+    data: userDataLength,
+    error: userErrorLength,
+    loading: userLoadingLength,
+    refetch: userRefetchLength,
+  } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN_LENGTH, {
+    variables: {
+      token,
+      limit: 20000,
+      start: 0,
+    },
+  });
+
+  const {
     data: userData,
     error: userError,
     loading: userLoading,
@@ -96,13 +115,15 @@ const AdminUsers = () => {
   } = useQuery<UserData>(GET_ALL_USERS_BY_ADMIN, {
     variables: {
       token,
+      limit: LIMIT,
+      start,
     },
   });
 
   useEffect(() => {
     refetch();
     userRefetch();
-  }, []);
+  }, [start]);
 
   const [
     addUserByAdminToken,
@@ -163,6 +184,7 @@ const AdminUsers = () => {
     });
 
   const userDataProp = userData?.getAllUsersByAdminToken;
+  const userDataPropLength = userDataLength?.getAllUsersByAdminToken;
 
   //console.log("userDataProp->", userDataProp);
 
@@ -178,6 +200,32 @@ const AdminUsers = () => {
     setUpdateId(id);
     setFunctionType("update");
   };
+
+  const totalData = userDataLength?.getAllUsersByAdminToken.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push("/admin-dashboard/users/#Header");
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push("/admin-dashboard/users/#Header");
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   if (loading && userLoading) {
     return <NetworkStatusApollo />;
@@ -220,18 +268,43 @@ const AdminUsers = () => {
             <PinkCard
               title="Users"
               icon={<UserRound size={16} strokeWidth={3} />}
-              data={userDataProp}
+              data={userDataPropLength}
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               handleAddButton={handleAddButton}
+              loading={searchTerm !== debouncedSearchTerm}
             />
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {userLoading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
             {data &&
             userData?.getAllUsersByAdminToken &&
             userDataProp &&
             userData.getAllUsersByAdminToken.length > 0 ? (
               userDataProp
                 .filter((user) =>
-                  user.userName.toLowerCase().includes(searchTerm.toLowerCase())
+                  user.userName
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase())
                 )
                 .sort((a, b) => a.userName.localeCompare(b.userName))
                 .map((user: User) => (
@@ -329,6 +402,28 @@ const AdminUsers = () => {
             ) : (
               <div className="card">No users available.</div>
             )}
+            <div className="prev_next">
+              <button onClick={handlePrevious} disabled={start === 0}>
+                Previous
+              </button>
+              {userLoading ? (
+                <span>
+                  Loading{" "}
+                  <RefreshCw size={14} strokeWidth={3} className="loader" />
+                </span>
+              ) : (
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+              )}
+
+              <button
+                onClick={handleNext}
+                disabled={start + LIMIT >= totalData}
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </section>

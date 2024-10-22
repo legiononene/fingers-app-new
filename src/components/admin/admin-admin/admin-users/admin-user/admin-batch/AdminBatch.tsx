@@ -8,7 +8,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import {
   ASSIGN_BATCH_TO_STUDENT,
   GET_ADMIN,
-  GET_ALL_BATCHES_BY_ADMIN,
+  GET_ALL_BATCHES_ID_BATCHNAME_BY_ADMIN,
+  GET_ALL_STUDENTS_BY_BATCH_ID_BY_USER_TOKEN,
   GET_BATCH_BY_BATCH_ID,
 } from "@/graphql/graphql-utils";
 import {
@@ -27,7 +28,7 @@ import {
   ErrorApollo,
   NetworkStatusApollo,
 } from "@/components/default/error-loading/ErrorLoading";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type AdminData = {
   getAdminByAdminToken: Admin;
@@ -41,11 +42,19 @@ type BatchData = {
   getAllBatchesByAdminId: Batch[];
 };
 
+type StudentsData = {
+  getAllStudentsByBatchId: Student[];
+};
+
+const LIMIT = 10;
+
 const AdminBatch = ({ slug }: { slug: string }) => {
   const [role, setRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [asign, setAsign] = useState<{ id: string } | null>(null);
   const [asignBatchId, setAsignBatchId] = useState<string | null>(slug);
+  const [start, setStart] = useState<number>(0);
 
   const { addToast } = useToast();
   const pathname = usePathname();
@@ -59,6 +68,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
   }, []);
 
   const { token } = useAuth();
+  const router = useRouter();
 
   const {
     data: adminData,
@@ -80,13 +90,55 @@ const AdminBatch = ({ slug }: { slug: string }) => {
     }
   );
 
+  const {
+    data: studentsData,
+    error: studentsError,
+    loading: studentsLoading,
+    refetch: studentsRefetch,
+  } = useQuery<StudentsData>(GET_ALL_STUDENTS_BY_BATCH_ID_BY_USER_TOKEN, {
+    variables: {
+      batchId: slug,
+      token,
+      limit: LIMIT,
+      start,
+    },
+  });
+
+  const totalData = data?.getBatchByBatchId.students.length || 0;
+  const currentPage = Math.ceil(start / LIMIT) + 1;
+  const totalPages = Math.ceil(totalData / LIMIT);
+
+  const handleNext = () => {
+    if (totalData > start + LIMIT) {
+      setStart(start + LIMIT);
+      router.push(`/admin-dashboard/batches/${slug}/#Header`);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (start >= LIMIT) {
+      setStart(start - LIMIT);
+      router.push(`/admin-dashboard/batches/${slug}/#Header`);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  //console.log("studentsData->", studentsData);
+
   //console.log("data.getBatchByBatchId->", data?.getBatchByBatchId);
 
   useEffect(() => {
     refetch();
   }, []);
 
-  const studentData = data?.getBatchByBatchId.students;
+  const studentData = studentsData?.getAllStudentsByBatchId;
 
   const [assignStudentToBatch, { loading: assignLoading }] =
     useMutation<BatchData>(ASSIGN_BATCH_TO_STUDENT, {
@@ -97,7 +149,7 @@ const AdminBatch = ({ slug }: { slug: string }) => {
       refetchQueries: [
         { query: GET_BATCH_BY_BATCH_ID, variables: { batchId: slug, token } },
         { query: GET_ADMIN, variables: { token } },
-        { query: GET_ALL_BATCHES_BY_ADMIN, variables: { token } },
+        { query: GET_ALL_BATCHES_ID_BATCHNAME_BY_ADMIN, variables: { token } },
       ],
       onCompleted: () => {
         addToast("Student assigned to Batch successfully", "success");
@@ -109,9 +161,11 @@ const AdminBatch = ({ slug }: { slug: string }) => {
     data: batchData,
     error: batchError,
     loading: batchLoading,
-  } = useQuery<BatchData>(GET_ALL_BATCHES_BY_ADMIN, {
+  } = useQuery<BatchData>(GET_ALL_BATCHES_ID_BATCHNAME_BY_ADMIN, {
     variables: {
       token,
+      limit: 5000,
+      start: 0,
     },
   });
 
@@ -200,10 +254,30 @@ const AdminBatch = ({ slug }: { slug: string }) => {
           <PinkCard
             title={data?.getBatchByBatchId.batchName}
             icon={<Shield size={16} strokeWidth={3} />}
-            data={studentData}
+            data={data?.getBatchByBatchId.students}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
+            loading={searchTerm !== debouncedSearchTerm}
           />
+          <div className="prev_next">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {studentsLoading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
           {data &&
           data.getBatchByBatchId &&
           studentData &&
@@ -213,9 +287,11 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                 (student) =>
                   student.studentName
                     .toLowerCase()
-                    .includes(searchTerm.toLowerCase()) ||
+                    .includes(debouncedSearchTerm.toLowerCase()) ||
                   (student.aadhar_number &&
-                    student.aadhar_number.toString().includes(searchTerm))
+                    student.aadhar_number
+                      .toString()
+                      .includes(debouncedSearchTerm))
               )
               .sort((a, b) => a.studentName.localeCompare(b.studentName))
               .map((student) => (
@@ -350,8 +426,38 @@ const AdminBatch = ({ slug }: { slug: string }) => {
                 </div>
               ))
           ) : (
-            <div className="card">No Students available.</div>
+            <>
+              {studentsLoading ? (
+                <div className="card">
+                  <span>
+                    Loading{" "}
+                    <RefreshCw size={14} strokeWidth={3} className="loader" />
+                  </span>{" "}
+                </div>
+              ) : (
+                <div className="card">No Students available.</div>
+              )}
+            </>
           )}
+          <div className="prev_next">
+            <button onClick={handlePrevious} disabled={start === 0}>
+              Previous
+            </button>
+            {studentsLoading ? (
+              <span>
+                Loading{" "}
+                <RefreshCw size={14} strokeWidth={3} className="loader" />
+              </span>
+            ) : (
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+            )}
+
+            <button onClick={handleNext} disabled={start + LIMIT >= totalData}>
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </section>

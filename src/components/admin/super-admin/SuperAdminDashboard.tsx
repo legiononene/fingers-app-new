@@ -27,6 +27,8 @@ const SuperAdminDashboard = () => {
   const { data, error, loading } = useQuery<Data>(GET_ALL_ADMINS, {
     variables: {
       token,
+      limit: 200,
+      start: 1,
     },
   });
 
