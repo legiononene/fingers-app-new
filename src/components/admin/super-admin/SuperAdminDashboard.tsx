@@ -28,9 +28,11 @@ const SuperAdminDashboard = () => {
     variables: {
       token,
       limit: 200,
-      start: 1,
+      start: 0,
     },
   });
+
+  console.log("data->", data);
 
   return (
     <section id="superAdminDashboard">

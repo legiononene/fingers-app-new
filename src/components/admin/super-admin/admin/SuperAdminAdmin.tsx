@@ -71,6 +71,8 @@ const SuperAdminAdmin = () => {
   const { data, error, networkStatus } = useQuery<Data>(GET_ALL_ADMINS, {
     variables: {
       token,
+      limit: 200,
+      start: 0,
     },
   });
 
