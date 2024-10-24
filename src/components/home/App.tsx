@@ -1,11 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./style.scss";
 import { LockKeyhole, LockKeyholeOpen, RefreshCw } from "lucide-react";
 import { useGesture } from "@use-gesture/react";
 import appDB from "@/database/appDS";
+import { io, Socket } from "socket.io-client";
+import { useAuth } from "@/contexts/authContext";
 
+const BackendUrl = process.env.NEXT_PUBLIC_GRAPHQL_API;
 const App = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [lockedScale, setLockedScale] = useState<number | null>(1); // Set default to 1 (locked by default)
@@ -15,6 +18,36 @@ const App = () => {
   const [loadingPriority, setLoadingPriority] = useState<boolean>(false);
   const [scale, setScale] = useState({ scale: 1 });
   const imageRef = useRef<HTMLImageElement | null>(null);
+
+  //*--> Socket Handling
+  const [data, setData] = useState<{
+    student: Student;
+    fingerData: FingerPrint[];
+  } | null>(null);
+  const { token } = useAuth();
+  useEffect(() => {
+    if (token) {
+      const newSocket = io((BackendUrl?.split("/graphql")[0] ?? "") + "/cli", {
+        extraHeaders: {
+          token,
+        },
+      });
+      newSocket.on("connect", () => {
+        newSocket.emit("handshake", { type: "WEB" });
+        console.log("Socket connected:", newSocket.id);
+      });
+      newSocket.on(
+        "finger_data",
+        (data: { data: { student: Student; fingerData: FingerPrint[] } }) => {
+          console.log("data:", data);
+          setData(data.data);
+        }
+      );
+      return () => {
+        newSocket.disconnect();
+      };
+    }
+  }, [token]);
 
   //*----------> Gesture handlers <----------
 
@@ -45,15 +78,17 @@ const App = () => {
   //*----------> Next/Prev Functions <----------
 
   const handlePrev = () => {
-    setImageIndex((prev) =>
-      prev === 0 ? appDB[0].images.length - 1 : prev - 1
-    );
+    if (data)
+      setImageIndex((prev) =>
+        prev === 0 ? data.fingerData.length - 1 : prev - 1
+      );
   };
 
   const handleNext = () => {
-    setImageIndex((prev) =>
-      prev === appDB[0].images.length - 1 ? 0 : prev + 1
-    );
+    if (data)
+      setImageIndex((prev) =>
+        prev === data.fingerData.length - 1 ? 0 : prev + 1
+      );
   };
 
   //*----------> Priority Functions <----------
@@ -86,7 +121,7 @@ const App = () => {
       </section>
     );
 
-  if (appDB.length === 0)
+  if (!data)
     return (
       <section id="homePage">
         <div className="fg">
@@ -105,8 +140,7 @@ const App = () => {
           <div className="img" ref={imageRef}>
             <img
               src={
-                appDB[0]?.images[imageIndex]?.image ||
-                "/assets/images/01/1.jpeg"
+                data.fingerData[imageIndex].image || "/assets/images/01/1.jpeg"
               }
               alt="fingerprint"
               style={{
@@ -119,13 +153,13 @@ const App = () => {
         </div>
         <div className="info text-s">
           <p>
-            Name: <span> {appDB[0]?.name || "No Data"}</span>
+            Name: <span> {data.student.studentName || "No Data"}</span>
           </p>
           <p>
-            ID: <span>{appDB[0]?._id || "No Data"}</span>
+            ID: <span>{data.student.aadhar_number || "No Data"}</span>
           </p>
           <p>
-            FD: <span>{appDB[0]?.images[imageIndex]?.fd}</span>
+            FD: <span>{data.fingerData[imageIndex].name}</span>
           </p>
           <p>
             Scale: <span>{scale.scale.toFixed(2)}</span>
@@ -197,7 +231,7 @@ const App = () => {
             </button>
           </div>
         </div>
-        {appDB[0]?.images && (
+        {data && (
           <div className="change">
             <button title="Previous Fingerprint" onClick={handlePrev}>
               Previous
