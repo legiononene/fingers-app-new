@@ -93,7 +93,7 @@ const App = () => {
 
   //*----------> Priority Functions <----------
 
-  const togglePrority = () => {
+  const toggleProbity = () => {
     setPriority(!priority);
   };
 
@@ -144,9 +144,7 @@ const App = () => {
               }
               alt="fingerprint"
               style={{
-                transform: `scale(${
-                  lockedScale !== null ? lockedScale : scale.scale
-                })`,
+                transform: `scale(${lockedScale ?? scale.scale})`,
               }}
             />
           </div>
@@ -170,7 +168,7 @@ const App = () => {
           <div className="priority">
             <button
               title={`${priority ? "Lock Priority" : "UnLock Priority"}`}
-              onClick={togglePrority}
+              onClick={toggleProbity}
               className={priority ? "active" : ""}
             >
               {priority ? (
