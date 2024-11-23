@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import "./style.scss";
 import { LockKeyhole, LockKeyholeOpen, RefreshCw } from "lucide-react";
 import { useGesture } from "@use-gesture/react";
-import appDB from "@/database/appDS";
-import { io, Socket } from "socket.io-client";
+import { io } from "socket.io-client";
 import { useAuth } from "@/contexts/authContext";
+import { useToast } from "@/contexts/toastContext";
+import axios from "axios";
 
 const BackendUrl = process.env.NEXT_PUBLIC_GRAPHQL_API;
 const App = () => {
@@ -18,7 +19,7 @@ const App = () => {
   const [loadingPriority, setLoadingPriority] = useState<boolean>(false);
   const [scale, setScale] = useState({ scale: 1 });
   const imageRef = useRef<HTMLImageElement | null>(null);
-
+  const toast = useToast()
   //*--> Socket Handling
   const [data, setData] = useState<{
     student: Student;
@@ -39,8 +40,14 @@ const App = () => {
       newSocket.on(
         "finger_data",
         (data: { data: { student: Student; fingerData: FingerPrint[] } }) => {
-          console.log("data:", data);
+          if (imageIndex != 0) {
+            setImageIndex(0)
+          }
+          // console.log("data:", data);
           setData(data.data);
+          // console.log((data.data.fingerData[0].scale ?? 0).toString())
+          setLockedScale(data.data.fingerData[0].scale ?? 1)
+          setScale({ scale: data.data.fingerData[0].scale ?? 1 })
         }
       );
       return () => {
@@ -53,9 +60,12 @@ const App = () => {
 
   useGesture(
     {
-      onPinch: ({ offset: [d] }) => {
+      onPinch: ({ offset: [d], }) => {
+
         if (lockedScale !== null) return; // Prevent scaling when locked
-        const newScale = Math.min(Math.max(1 + d / 5, 1), 2);
+
+        // Adjust zoom sensitivity by directly using 'd'
+        const newScale = parseFloat(Math.min(Math.max(1 + d, 1), 2).toFixed(2));
         setScale({ scale: newScale });
       },
     },
@@ -64,6 +74,9 @@ const App = () => {
       eventOptions: { passive: false },
     }
   );
+
+
+
 
   //*----------> Lock/Unlock Scale <----------
 
@@ -97,15 +110,60 @@ const App = () => {
     setPriority(!priority);
   };
 
-  const runForOneSecond = (loader: string) => {
+  const runForOneSecond = (loader: "priority" | "scale") => {
     const setLoadingState =
       loader === "priority" ? setLoadingPriority : setLoadingScale;
 
     setLoadingState(true);
 
-    setTimeout(() => {
-      setLoadingState(false);
-    }, 2000);
+    if (loader == "priority") {
+      if (!token) {
+        toast.addToast("Login again!!", "error")
+      }
+      axios.post((BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-priority", {
+        StudentId: data?.student.id,
+        fingerId: data?.fingerData[imageIndex].id
+      }, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }).then(({ data }) => {
+        toast.addToast(data.message, "success")
+      }).catch((e) => {
+        console.log(e.response.data);
+        toast.addToast(e.response.data, "error")
+
+      }).finally(() => {
+        setLoading(false);
+        setLoadingState(false);
+        setPriority(!priority)
+      })
+    }
+    if (loader == "scale") {
+      if (!token) {
+        toast.addToast("Login again!!", "error")
+      }
+      axios.post((BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-scale", {
+        fingerId: data?.fingerData[imageIndex].id,
+        scale: scale.scale
+      }, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }).then(({ data }) => {
+        toast.addToast(data.message, "success")
+      }).catch((e) => {
+        console.log(e.response.data);
+        toast.addToast(e.response.data, "error")
+
+      }).finally(() => {
+        setLoading(false);
+        setLoadingState(false);
+        setLockedScale(scale.scale)
+
+      })
+    }
+
   };
 
   //*----------> Conditional rendering <----------
