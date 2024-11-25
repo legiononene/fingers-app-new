@@ -19,7 +19,7 @@ const App = () => {
   const [loadingPriority, setLoadingPriority] = useState<boolean>(false);
   const [scale, setScale] = useState({ scale: 1 });
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const toast = useToast()
+  const toast = useToast();
   //*--> Socket Handling
   const [data, setData] = useState<{
     student: Student;
@@ -41,13 +41,13 @@ const App = () => {
         "finger_data",
         (data: { data: { student: Student; fingerData: FingerPrint[] } }) => {
           if (imageIndex != 0) {
-            setImageIndex(0)
+            setImageIndex(0);
           }
           // console.log("data:", data);
           setData(data.data);
           // console.log((data.data.fingerData[0].scale ?? 0).toString())
-          setLockedScale(data.data.fingerData[0].scale ?? 1)
-          setScale({ scale: data.data.fingerData[0].scale ?? 1 })
+          setLockedScale(parseFloat(data.data.fingerData[0].scale ?? "1"));
+          setScale({ scale: parseFloat(data.data.fingerData[0].scale ?? "1") });
         }
       );
       return () => {
@@ -60,8 +60,7 @@ const App = () => {
 
   useGesture(
     {
-      onPinch: ({ offset: [d], }) => {
-
+      onPinch: ({ offset: [d] }) => {
         if (lockedScale !== null) return; // Prevent scaling when locked
 
         // Adjust zoom sensitivity by directly using 'd'
@@ -74,9 +73,6 @@ const App = () => {
       eventOptions: { passive: false },
     }
   );
-
-
-
 
   //*----------> Lock/Unlock Scale <----------
 
@@ -118,52 +114,64 @@ const App = () => {
 
     if (loader == "priority") {
       if (!token) {
-        toast.addToast("Login again!!", "error")
+        toast.addToast("Login again!!", "error");
       }
-      axios.post((BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-priority", {
-        StudentId: data?.student.id,
-        fingerId: data?.fingerData[imageIndex].id
-      }, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }).then(({ data }) => {
-        toast.addToast(data.message, "success")
-      }).catch((e) => {
-        console.log(e.response.data);
-        toast.addToast(e.response.data, "error")
-
-      }).finally(() => {
-        setLoading(false);
-        setLoadingState(false);
-        setPriority(!priority)
-      })
+      axios
+        .post(
+          (BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-priority",
+          {
+            StudentId: data?.student.id,
+            fingerId: data?.fingerData[imageIndex].id,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then(({ data }) => {
+          toast.addToast(data.message, "success");
+        })
+        .catch((e) => {
+          console.log(e.response.data);
+          toast.addToast(e.response.data, "error");
+        })
+        .finally(() => {
+          setLoading(false);
+          setLoadingState(false);
+          setPriority(!priority);
+        });
     }
     if (loader == "scale") {
       if (!token) {
-        toast.addToast("Login again!!", "error")
+        toast.addToast("Login again!!", "error");
       }
-      axios.post((BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-scale", {
-        fingerId: data?.fingerData[imageIndex].id,
-        scale: scale.scale
-      }, {
-        headers: {
-          "Authorization": `Bearer ${token}`
-        }
-      }).then(({ data }) => {
-        toast.addToast(data.message, "success")
-      }).catch((e) => {
-        console.log(e.response.data);
-        toast.addToast(e.response.data, "error")
-
-      }).finally(() => {
-        setLoading(false);
-        setLoadingState(false);
-        setLockedScale(scale.scale)
-
-      })
+      axios
+        .post(
+          (BackendUrl?.split("/graphql")[0] ?? "") + "/set-finger-scale",
+          {
+            fingerId: data?.fingerData[imageIndex].id,
+            scale: scale.scale,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then(({ data }) => {
+          toast.addToast(data.message, "success");
+        })
+        .catch((e) => {
+          console.log(e.response.data);
+          toast.addToast(e.response.data, "error");
+        })
+        .finally(() => {
+          setLoading(false);
+          setLoadingState(false);
+          setLockedScale(scale.scale);
+        });
     }
-
   };
 
   //*----------> Conditional rendering <----------
