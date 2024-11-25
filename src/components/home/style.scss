@@ -10,6 +10,11 @@
     flex-direction: column;
     gap: rem(10);
 
+    p {
+      text-align: center;
+      margin-top: rem(20);
+    }
+
     //*----------> Loading
 
     .center {
