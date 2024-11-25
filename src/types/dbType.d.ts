@@ -4,7 +4,7 @@ type FingerPrint = {
   image: string;
   priority?: number;
   name?: string; // "FD-1" ,"FD-2",
-  scale?: string;
+  scale?: number;
 };
 
 type Details = {

@@ -46,8 +46,8 @@ const App = () => {
           // console.log("data:", data);
           setData(data.data);
           // console.log((data.data.fingerData[0].scale ?? 0).toString())
-          setLockedScale(parseFloat(data.data.fingerData[0].scale ?? "1"));
-          setScale({ scale: parseFloat(data.data.fingerData[0].scale ?? "1") });
+          setLockedScale(data.data.fingerData[0].scale ?? 1);
+          setScale({ scale: data.data.fingerData[0].scale ?? 1 });
         }
       );
       return () => {
@@ -179,7 +179,7 @@ const App = () => {
     return (
       <section id="homePage">
         <div className="fg">
-          <p>Loading..</p>
+          <p className="condition">Loading..</p>
           <div className="center">
             <RefreshCw size={40} className="loader" />
           </div>
@@ -191,7 +191,7 @@ const App = () => {
     return (
       <section id="homePage">
         <div className="fg">
-          <p>Waiting for server..</p>
+          <p className="condition">Waiting for server..</p>
           <div className="center">
             <RefreshCw size={40} className="loader" />
           </div>
