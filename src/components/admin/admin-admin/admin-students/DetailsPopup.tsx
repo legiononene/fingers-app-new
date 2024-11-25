@@ -108,7 +108,7 @@ const DetailsPopup = ({ openDetailsId, setOpenDetailsId, data }: Props) => {
               DOB:{" "}
               <span className="highlight text-xs">
                 {student.details?.dob &&
-                  new Date(parseInt(student.details?.dob)).toLocaleDateString(
+                  student.details.dob.toLocaleDateString(
                     "en",
                     IST_DATE_ONLY
                   )}
