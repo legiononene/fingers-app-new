@@ -94,7 +94,9 @@ const PinkCard = ({
             title="Add Multiple Students"
             id="add-button"
             onClick={handleAddMultipleButton}
-          ></button>
+          >
+            <UsersRound />
+          </button>
         )}
       </div>
     </div>
