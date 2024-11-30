@@ -120,7 +120,7 @@ const Auth = () => {
               />
             </div>
             <div className="form-field">
-              <label className="highlight">Username:</label>
+              <label className="highlight">Password:</label>
               <input
                 type={openPassword ? "text" : "password"}
                 value={password}
