@@ -184,23 +184,26 @@ const AddFingers = ({
             <div className="existing-fingers">
               <p className="highlight">Existing Fingerprints:</p>
               <div className="images-container">
-                {data.fingerprints.map((finger, i) => (
-                  <div className="img-container" key={finger.id}>
-                    <p className="text-xxs">{finger.name}</p>
-                    <img src={finger.image} alt={finger.id} />
-                    <button
-                      title="Delete this Fingerprint"
-                      type="button"
-                      onClick={() => handleDelete(finger.id)}
-                    >
-                      {deleteLoadingStates[finger.id as string] ? (
-                        <RefreshCw size={14} className="loader" />
-                      ) : (
-                        <Trash size={14} />
-                      )}
-                    </button>
-                  </div>
-                ))}
+                {data.fingerprints
+                  .slice() // Create a shallow copy to avoid mutating the original array
+                  .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")) // Provide a default value for name
+                  .map((finger, i) => (
+                    <div className="img-container" key={finger.id}>
+                      <p className="text-xxs">{finger.name}</p>
+                      <img src={finger.image} alt={finger.id} />
+                      <button
+                        title="Delete this Fingerprint"
+                        type="button"
+                        onClick={() => handleDelete(finger.id)}
+                      >
+                        {deleteLoadingStates[finger.id as string] ? (
+                          <RefreshCw size={14} className="loader" />
+                        ) : (
+                          <Trash size={14} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
               </div>
             </div>
           )}
